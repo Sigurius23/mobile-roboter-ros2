@@ -1,0 +1,26 @@
+# ros2
+**/log/
+**/install/
+**/build/
+**/cmake-builds-*/
+**/.cache/
+CMakeLists.txt.user
+compile_commands.json
+**/srv/_*.py
+*.pcd
+*.pyc
+qtcreator-*
+*.user
+*~
+COLCON_IGNORE
+CATKIN_IGNORE
+AMENT_IGNORE
+
+# editors
+**/.vscode/
+*.vsix
+**/.idea/
+*.swp.*
+*-swp.*
+*.project
+*.cproject

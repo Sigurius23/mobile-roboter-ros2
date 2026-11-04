@@ -1,0 +1,5 @@
+# The workspace is built and run in Linux (WSL), so keep Unix line endings
+# everywhere, also when the repo is checked out on Windows.
+* text=auto eol=lf
+*.pdf binary
+*.png binary

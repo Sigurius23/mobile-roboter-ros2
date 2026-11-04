@@ -1,0 +1,895 @@
+<title>Übung 2 Code Map</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one reading column (68ch prose) that widens to 1040px for diagrams, code and tables.
+   Orange marks what is ours (the node, its /tf output); teal marks ROS topics; grey is the bag and the tools. */
+:root {
+  --bg: #f2f5f6;
+  --surface: #ffffff;
+  --ink: #15212b;
+  --muted: #586774;
+  --line: #d2dbe1;
+  --accent: #c2410c;
+  --accent-soft: #fdeadf;
+  --topic: #0e7490;
+  --topic-soft: #e0f2f6;
+  --code-bg: #eaf0f2;
+  --code-fg: #17242e;
+  --c-kw: #a63a0b;
+  --c-str: #0f766e;
+  --c-com: #66757f;
+  --c-ty: #1e4fbf;
+  --c-num: #8a3fb8;
+  --c-fn: #8a5a00;
+  --ok: #2f7d32;
+  --f-display: "IBM Plex Sans Condensed", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d151b; --surface: #142029; --ink: #e2e9ee; --muted: #94a4b1; --line: #283945;
+    --accent: #ff8b4f; --accent-soft: #3a2015; --topic: #52c6de; --topic-soft: #0f2f38;
+    --code-bg: #0f1a21; --code-fg: #d9e4ea; --c-kw: #ffa06b; --c-str: #73e2b5; --c-com: #7d8f9b;
+    --c-ty: #94c2ff; --c-num: #d7b0ff; --c-fn: #f6cf6a; --ok: #7bd389;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d151b; --surface: #142029; --ink: #e2e9ee; --muted: #94a4b1; --line: #283945;
+  --accent: #ff8b4f; --accent-soft: #3a2015; --topic: #52c6de; --topic-soft: #0f2f38;
+  --code-bg: #0f1a21; --code-fg: #d9e4ea; --c-kw: #ffa06b; --c-str: #73e2b5; --c-com: #7d8f9b;
+  --c-ty: #94c2ff; --c-num: #d7b0ff; --c-fn: #f6cf6a; --ok: #7bd389;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 1rem;
+  line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 4rem;
+}
+.wrap { max-width: 1040px; margin: 0 auto; }
+.prose { max-width: 68ch; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; line-height: 1.15; margin: 0; }
+h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: 1.75rem; font-weight: 600; }
+h3 { font-size: 1.2rem; font-weight: 600; }
+p { margin: 0; }
+a { color: var(--topic); }
+code, kbd, .mono { font-family: var(--f-mono); font-size: 0.88em; }
+:not(pre) > code {
+  background: var(--code-bg); color: var(--code-fg);
+  padding: 0.08em 0.35em; border-radius: 4px; overflow-wrap: anywhere;
+}
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Header */
+header.top { padding-block: 3rem 2rem; display: grid; gap: 1rem; border-bottom: 1px solid var(--line); }
+.eyebrow {
+  font-family: var(--f-mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--muted);
+}
+.lede { font-size: 1.15rem; color: var(--ink); max-width: 60ch; }
+.facts { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.fact {
+  font-family: var(--f-mono); font-size: 0.78rem; color: var(--muted);
+  border: 1px solid var(--line); border-radius: 999px; padding: 0.2rem 0.7rem; background: var(--surface);
+}
+nav.toc { display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; padding-block: 1rem; border-bottom: 1px solid var(--line); }
+nav.toc a { font-family: var(--f-display); font-weight: 500; text-decoration: none; color: var(--muted); }
+nav.toc a:hover { color: var(--accent); }
+
+/* Sections */
+section { padding-block: 3rem 0; display: grid; gap: 1.25rem; scroll-margin-top: 1rem; }
+section > .head { display: grid; gap: 0.4rem; }
+.step-no { font-family: var(--f-mono); font-size: 0.8rem; color: var(--accent); letter-spacing: 0.06em; }
+
+/* Tables */
+.table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+th, td { text-align: left; vertical-align: top; padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--line); }
+tr:last-child td { border-bottom: 0; }
+th { font-family: var(--f-display); font-weight: 600; font-size: 0.85rem; letter-spacing: 0.03em; color: var(--muted); background: var(--bg); }
+td.num { font-variant-numeric: tabular-nums; font-family: var(--f-mono); font-size: 0.85rem; white-space: nowrap; }
+td .pass { color: var(--ok); font-weight: 600; }
+
+/* File tree */
+pre.tree {
+  margin: 0; padding: 1rem 1.1rem; overflow-x: auto; background: var(--surface);
+  border: 1px solid var(--line); border-radius: 8px;
+  font-family: var(--f-mono); font-size: 0.82rem; line-height: 1.55; color: var(--ink);
+}
+pre.tree .note { color: var(--muted); }
+pre.tree .ours { color: var(--accent); font-weight: 600; }
+pre.tree .gen { color: var(--muted); }
+
+/* Code blocks */
+.code { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--code-bg); min-width: 0; }
+.code .bar {
+  display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+  padding: 0.45rem 0.9rem; border-bottom: 1px solid var(--line);
+  font-family: var(--f-mono); font-size: 0.75rem; color: var(--muted); background: var(--surface);
+}
+.code pre { margin: 0; padding: 0.9rem 1rem; overflow-x: auto; }
+.code pre code { font-family: var(--f-mono); font-size: 0.8rem; line-height: 1.55; color: var(--code-fg); background: none; padding: 0; }
+.hljs-keyword, .hljs-meta .hljs-keyword, .hljs-selector-tag { color: var(--c-kw); }
+.hljs-string, .hljs-meta .hljs-string, .hljs-attr + .hljs-string { color: var(--c-str); }
+.hljs-comment { color: var(--c-com); font-style: italic; }
+.hljs-type, .hljs-built_in, .hljs-name { color: var(--c-ty); }
+.hljs-number, .hljs-literal { color: var(--c-num); }
+.hljs-title, .hljs-title.function_ { color: var(--c-fn); }
+.hljs-meta { color: var(--c-kw); }
+.hljs-attr, .hljs-variable, .hljs-params { color: var(--code-fg); }
+.hljs-tag { color: var(--muted); }
+
+/* Two-up grids */
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 1rem; }
+.two > * { min-width: 0; }
+
+/* Walkthrough rows: explanation beside code */
+.walk { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); gap: 1.25rem; align-items: start; }
+.walk + .walk { padding-top: 1.5rem; border-top: 1px dashed var(--line); }
+.walk .explain { display: grid; gap: 0.6rem; }
+.walk .explain ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.35rem; }
+@media (max-width: 820px) { .walk { grid-template-columns: minmax(0, 1fr); } }
+
+/* Numbered pipeline (a real sequence) */
+ol.pipeline { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; counter-reset: s; }
+ol.pipeline li {
+  counter-increment: s; display: grid; grid-template-columns: 2.4rem minmax(0, 1fr); gap: 0.75rem;
+  padding: 0.85rem 0; border-bottom: 1px solid var(--line);
+}
+ol.pipeline li:last-child { border-bottom: 0; }
+ol.pipeline li::before {
+  content: counter(s); font-family: var(--f-display); font-weight: 700; font-size: 1.35rem; color: var(--accent);
+  line-height: 1.2;
+}
+ol.pipeline .what { display: grid; gap: 0.2rem; min-width: 0; }
+ol.pipeline .where { font-family: var(--f-mono); font-size: 0.8rem; color: var(--muted); overflow-wrap: anywhere; }
+
+/* Formula */
+.formula {
+  font-family: var(--f-mono); font-size: 0.9rem; background: var(--surface); border: 1px solid var(--line);
+  border-left: 3px solid var(--accent); border-radius: 6px; padding: 0.8rem 1rem; line-height: 1.8; overflow-x: auto;
+  white-space: pre;
+}
+
+/* Diagrams */
+figure { margin: 0; display: grid; gap: 0.6rem; }
+.dg-scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 0.75rem; }
+.dg-scroll svg { display: block; width: 100%; height: auto; min-width: 760px; }
+figcaption { font-size: 0.9rem; color: var(--muted); max-width: 75ch; }
+.legend { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; font-size: 0.85rem; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 0.45rem; }
+.sw { width: 26px; height: 0; border-top: 2px solid var(--muted); display: inline-block; }
+.sw.o { border-top-color: var(--accent); }
+.sw.d { border-top-style: dashed; }
+
+.dg text { font-family: var(--f-mono); font-size: 12px; fill: var(--ink); }
+.dg .t { font-family: var(--f-display); font-weight: 600; font-size: 15px; }
+.dg .l { font-size: 11px; fill: var(--muted); }
+.dg .lo { font-size: 11px; fill: var(--accent); }
+.dg .ext { fill: var(--surface); stroke: var(--muted); stroke-width: 1.4; }
+.dg .ours { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2; }
+.dg .topic { fill: var(--topic-soft); stroke: var(--topic); stroke-width: 1.4; }
+.dg .frame { fill: var(--bg); stroke: var(--muted); stroke-width: 1.2; }
+.dg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 4 3; }
+.dg .e { fill: none; stroke: var(--muted); stroke-width: 1.4; }
+.dg .eo { fill: none; stroke: var(--accent); stroke-width: 2; }
+.dg .dash { stroke-dasharray: 5 4; }
+.dg .ah { fill: var(--muted); }
+.dg .aho { fill: var(--accent); }
+
+/* Command blocks */
+.cmds { display: grid; gap: 0.9rem; }
+.cmd { display: grid; gap: 0.35rem; }
+.cmd .label { font-family: var(--f-display); font-weight: 600; }
+.cmd .box { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: stretch; border: 1px solid var(--line); border-radius: 8px; background: var(--code-bg); overflow: hidden; }
+.cmd pre { margin: 0; padding: 0.7rem 0.9rem; overflow-x: auto; font-family: var(--f-mono); font-size: 0.82rem; color: var(--code-fg); }
+.cmd button {
+  font-family: var(--f-mono); font-size: 0.75rem; border: 0; border-left: 1px solid var(--line);
+  background: var(--surface); color: var(--ink); padding: 0 0.9rem; cursor: pointer; min-width: 5.5rem;
+}
+.cmd button:hover { color: var(--accent); }
+.cmd .hint { font-size: 0.88rem; color: var(--muted); }
+
+.callout {
+  background: var(--accent-soft); border-radius: 8px; padding: 0.9rem 1.1rem; display: grid; gap: 0.35rem;
+  max-width: 75ch;
+}
+.callout strong { font-family: var(--f-display); font-weight: 600; }
+footer { padding-block: 3rem 0; color: var(--muted); font-size: 0.85rem; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+html { scroll-behavior: smooth; }
+</style>
+
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">Mobile Roboter · Übung 2 · package odom_transform</div>
+  <h1>Übung 2 Code Map</h1>
+  <p class="lede">How the setup on drive E, the package files and the running ROS nodes connect, with the code that does each part.</p>
+  <div class="facts">
+    <span class="fact">ROS 2 Jazzy</span>
+    <span class="fact">Ubuntu 24.04 in WSL2</span>
+    <span class="fact">bag dlg_feldtage_24:cut · 40 s</span>
+    <span class="fact">built and tested 4 Nov 2026</span>
+  </div>
+</header>
+
+<nav class="toc" aria-label="Sections">
+  <a href="#files">Files</a>
+  <a href="#build">Build chain</a>
+  <a href="#graph">ROS graph</a>
+  <a href="#tf">TF tree</a>
+  <a href="#node">Inside the node</a>
+  <a href="#tests">Test results</a>
+  <a href="#run">Run it</a>
+</nav>
+
+<!-- ============================== FILES ============================== -->
+<section id="files">
+  <div class="head">
+    <h2>Where the files live</h2>
+    <p class="prose">Drive E holds both worlds. The course folder is a normal Windows folder that Ubuntu sees under <code>/mnt/e</code>. Ubuntu's own disk, with ROS and the bagfile inside, is a single file on E.</p>
+  </div>
+
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>What</th><th>From Windows</th><th>From Ubuntu</th></tr></thead>
+      <tbody>
+        <tr><td>Course folder and workspace</td><td class="mono">E:\aufgaben-public\ros2_ws</td><td class="mono">/mnt/e/aufgaben-public/ros2_ws</td></tr>
+        <tr><td>Ubuntu's disk</td><td class="mono">E:\WSL\Ubuntu-24.04\ext4.vhdx</td><td class="mono">/</td></tr>
+        <tr><td>ROS 2 Jazzy</td><td class="mono">inside the disk</td><td class="mono">/opt/ros/jazzy</td></tr>
+        <tr><td>Bagfile</td><td class="mono">\\wsl$\Ubuntu-24.04\home\ubuntu\.cache\marina\…</td><td class="mono">/home/ubuntu/.cache/marina/bags/dlg_feldtage_24_cut/ready</td></tr>
+        <tr><td>Shell setup</td><td class="mono">–</td><td class="mono">~/.bashrc sources ROS and install/setup.bash</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+<pre class="tree" aria-label="Folder structure of E:\aufgaben-public">aufgaben-public/
+├── 0_setup/ueb0.pdf                      <span class="note">week 0 sheet: ROS, colcon, rosdep, marina</span>
+├── 1_noisy_sensor/                       <span class="note">Übung 1 sheet</span>
+├── 2_odom_transform/README.md            <span class="note">Übung 2 sheet (steps 1–8, two questions)</span>
+├── setup_week0.sh                        <span class="note">installs ROS 2 Jazzy, marina, rosdep, .bashrc lines</span>
+└── ros2_ws/                              <span class="note">colcon workspace: run colcon build here</span>
+    ├── ANTWORTEN.md                      <span class="note">notes and answers for the Testat (German)</span>
+    ├── src/
+    │   ├── <span class="ours">odom_transform/</span>                 <span class="note">the Übung 2 package</span>
+    │   │   ├── <span class="ours">package.xml</span>               <span class="note">name, version, dependencies</span>
+    │   │   ├── <span class="ours">CMakeLists.txt</span>            <span class="note">how to compile and install the node</span>
+    │   │   └── src/<span class="ours">odom_transform_node.cpp</span>  <span class="note">the node, 191 lines</span>
+    │   └── denoise_sensor/                <span class="note">old Übung 1 attempt, not used</span>
+    ├── <span class="gen">build/</span>                            <span class="note">generated: CMake and compiler output</span>
+    ├── <span class="gen">install/</span>                          <span class="note">generated: the runnable node and setup.bash</span>
+    └── <span class="gen">log/</span>                              <span class="note">generated: build logs</span></pre>
+</section>
+
+<!-- ============================== BUILD ============================== -->
+<section id="build">
+  <div class="head">
+    <h2>From source file to running node</h2>
+    <p class="prose">Three files describe the package. Every dependency has to appear in all three places, or the build fails at that step.</p>
+  </div>
+
+  <ol class="pipeline">
+    <li><div class="what"><strong><code>package.xml</code> declares the dependencies</strong><span>rosdep reads it to install missing packages, and colcon reads the build type <code>ament_cmake</code>.</span><span class="where">rosdep install --from-paths src -y --ignore-src</span></div></li>
+    <li><div class="what"><strong><code>CMakeLists.txt</code> finds them and builds the executable</strong><span><code>find_package</code> locates each dependency, <code>add_executable</code> compiles the .cpp, and <code>ament_target_dependencies</code> adds include paths and libraries.</span><span class="where">colcon build --packages-select odom_transform</span></div></li>
+    <li><div class="what"><strong><code>install()</code> copies the binary into the workspace</strong><span>ROS only finds what is in <code>install/</code>, not what is in <code>build/</code>.</span><span class="where">install/odom_transform/lib/odom_transform/odom_transform_node</span></div></li>
+    <li><div class="what"><strong>Sourcing adds the workspace to the environment</strong><span>It puts the package on <code>AMENT_PREFIX_PATH</code>. Your <code>~/.bashrc</code> already does this in every new terminal.</span><span class="where">source install/setup.bash</span></div></li>
+    <li><div class="what"><strong><code>ros2 run</code> starts it</strong><span>It looks up <code>lib/odom_transform/odom_transform_node</code> under every sourced prefix.</span><span class="where">ros2 run odom_transform odom_transform_node</span></div></li>
+  </ol>
+
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Dependency</th><th>package.xml</th><th>CMakeLists.txt</th><th>Used in the node for</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">rclcpp</td><td class="mono">&lt;depend&gt;</td><td class="mono">find_package + ament_target_dependencies</td><td><code>rclcpp::Node</code>, subscriptions, parameters, logging, <code>spin</code></td></tr>
+        <tr><td class="mono">nav_msgs</td><td class="mono">&lt;depend&gt;</td><td class="mono">same</td><td><code>nav_msgs::msg::Odometry</code> on <code>/odom</code></td></tr>
+        <tr><td class="mono">sensor_msgs</td><td class="mono">&lt;depend&gt;</td><td class="mono">same</td><td><code>sensor_msgs::msg::Imu</code> on <code>/imu/data_raw</code> (step 8)</td></tr>
+        <tr><td class="mono">geometry_msgs</td><td class="mono">&lt;depend&gt;</td><td class="mono">same</td><td><code>TransformStamped</code>, the message that goes on <code>/tf</code></td></tr>
+        <tr><td class="mono">tf2</td><td class="mono">&lt;depend&gt;</td><td class="mono">same</td><td><code>Quaternion</code>, <code>Vector3</code>, <code>quatRotate</code>, <code>TransformException</code></td></tr>
+        <tr><td class="mono">tf2_ros</td><td class="mono">&lt;depend&gt;</td><td class="mono">same</td><td><code>TransformBroadcaster</code>, <code>Buffer</code>, <code>TransformListener</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="two">
+    <div class="code">
+      <div class="bar"><span>ros2_ws/src/odom_transform/package.xml</span><span>lines 10–21</span></div>
+<pre><code class="language-xml">  &lt;buildtool_depend&gt;ament_cmake&lt;/buildtool_depend&gt;
+
+  &lt;depend&gt;geometry_msgs&lt;/depend&gt;
+  &lt;depend&gt;nav_msgs&lt;/depend&gt;
+  &lt;depend&gt;rclcpp&lt;/depend&gt;
+  &lt;depend&gt;sensor_msgs&lt;/depend&gt;
+  &lt;depend&gt;tf2&lt;/depend&gt;
+  &lt;depend&gt;tf2_ros&lt;/depend&gt;
+
+  &lt;export&gt;
+    &lt;build_type&gt;ament_cmake&lt;/build_type&gt;
+  &lt;/export&gt;</code></pre>
+    </div>
+    <div class="code">
+      <div class="bar"><span>ros2_ws/src/odom_transform/CMakeLists.txt</span><span>lines 12–32</span></div>
+<pre><code class="language-cmake">find_package(ament_cmake REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(tf2 REQUIRED)
+find_package(tf2_ros REQUIRED)
+
+add_executable(odom_transform_node
+  src/odom_transform_node.cpp)
+ament_target_dependencies(odom_transform_node
+  geometry_msgs nav_msgs rclcpp
+  sensor_msgs tf2 tf2_ros)
+install(TARGETS odom_transform_node
+  DESTINATION lib/${PROJECT_NAME})
+
+ament_package()</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== GRAPH ============================== -->
+<section id="graph">
+  <div class="head">
+    <h2>The ROS graph while it runs</h2>
+    <p class="prose">Nodes never call each other directly. The bag player publishes topics, our node subscribes to two of them and publishes one transform, and RViz and rqt read the result.</p>
+  </div>
+
+  <figure>
+    <div class="legend" aria-hidden="true">
+      <span><i class="sw o"></i>ours</span>
+      <span><i class="sw"></i>always connected</span>
+      <span><i class="sw d"></i>only with <code>use_imu:=true</code></span>
+    </div>
+    <div class="dg-scroll">
+      <svg class="dg" viewBox="0 0 1000 400" role="img" aria-label="ROS graph: ros2 bag play publishes /odom, /imu/data_raw, /tf_static, /ouster/points and /tf renamed to /tf_old. odom_transform_node subscribes /odom, and with use_imu also /imu/data_raw and /tf_static, and publishes /tf with my_odom to base_footprint. rviz2 and rqt_tf_tree read /tf, /tf_static and /ouster/points. Nothing subscribes /tf_old.">
+        <defs>
+          <marker id="g-a" viewBox="0 0 8 8" refX="8" refY="4" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path class="ah" d="M0,0 L8,4 L0,8 z"/></marker>
+          <marker id="g-ao" viewBox="0 0 8 8" refX="8" refY="4" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto"><path class="aho" d="M0,0 L8,4 L0,8 z"/></marker>
+        </defs>
+
+        <!-- bag player -->
+        <rect class="ext" x="16" y="40" width="170" height="340" rx="8"/>
+        <text class="t" x="101" y="66" text-anchor="middle">ros2 bag play</text>
+        <text class="l" x="101" y="88" text-anchor="middle">dlg_feldtage_24:cut</text>
+        <text class="l" x="101" y="104" text-anchor="middle">--loop</text>
+        <text class="l" x="101" y="120" text-anchor="middle">--remap /tf:=/tf_old</text>
+        <text class="l" x="101" y="364" text-anchor="middle">node: rosbag2_player</text>
+
+        <!-- topics -->
+        <rect class="topic" x="236" y="96" width="180" height="28" rx="14"/>
+        <text x="326" y="114" text-anchor="middle">/odom · 50 Hz</text>
+        <rect class="topic" x="236" y="136" width="180" height="28" rx="14"/>
+        <text x="326" y="154" text-anchor="middle">/imu/data_raw · 125 Hz</text>
+        <rect class="topic" x="236" y="176" width="180" height="28" rx="14"/>
+        <text x="326" y="194" text-anchor="middle">/tf_static · latched</text>
+        <rect class="topic" x="236" y="282" width="180" height="28" rx="14"/>
+        <text x="326" y="300" text-anchor="middle">/ouster/points · 20 Hz</text>
+        <rect class="ghost" x="236" y="336" width="180" height="28" rx="14"/>
+        <text x="326" y="354" text-anchor="middle">/tf_old</text>
+
+        <line class="e" x1="186" y1="110" x2="234" y2="110" marker-end="url(#g-a)"/>
+        <line class="e" x1="186" y1="150" x2="234" y2="150" marker-end="url(#g-a)"/>
+        <line class="e" x1="186" y1="190" x2="234" y2="190" marker-end="url(#g-a)"/>
+        <line class="e" x1="186" y1="296" x2="234" y2="296" marker-end="url(#g-a)"/>
+        <line class="e dash" x1="186" y1="350" x2="234" y2="350" marker-end="url(#g-a)"/>
+
+        <!-- our node -->
+        <rect class="ours" x="470" y="70" width="210" height="160" rx="8"/>
+        <text class="t" x="575" y="92" text-anchor="middle">odom_transform_node</text>
+        <text x="486" y="114">on_odom() → x, y, θ</text>
+        <text x="486" y="154">on_imu() → gyro yaw</text>
+        <text x="486" y="194">tf listener: imu → base</text>
+        <text x="486" y="220">publish_transform()</text>
+
+        <line class="e" x1="416" y1="110" x2="468" y2="110" marker-end="url(#g-a)"/>
+        <line class="e dash" x1="416" y1="150" x2="468" y2="150" marker-end="url(#g-a)"/>
+        <line class="e dash" x1="416" y1="190" x2="468" y2="190" marker-end="url(#g-a)"/>
+
+        <!-- output /tf -->
+        <line class="eo" x1="680" y1="216" x2="738" y2="216" marker-end="url(#g-ao)"/>
+        <rect class="ours" x="740" y="202" width="100" height="28" rx="14"/>
+        <text x="790" y="220" text-anchor="middle">/tf</text>
+        <text class="lo" x="790" y="248" text-anchor="middle">my_odom → base_footprint</text>
+
+        <!-- consumers -->
+        <rect class="ext" x="890" y="72" width="100" height="46" rx="8"/>
+        <text x="940" y="99" text-anchor="middle">rqt_tf_tree</text>
+        <rect class="ext" x="890" y="170" width="100" height="160" rx="8"/>
+        <text class="t" x="940" y="194" text-anchor="middle">rviz2</text>
+        <text class="l" x="940" y="234" text-anchor="middle">Fixed Frame</text>
+        <text class="l" x="940" y="250" text-anchor="middle">my_odom</text>
+        <text class="l" x="940" y="304" text-anchor="middle">+ PointCloud2</text>
+        <text class="l" x="940" y="320" text-anchor="middle">+ TF</text>
+
+        <path class="eo" d="M840,216 H864 V95 H888" marker-end="url(#g-ao)"/>
+        <line class="eo" x1="864" y1="216" x2="888" y2="216" marker-end="url(#g-ao)"/>
+        <path class="e" d="M326,204 V268 H888" marker-end="url(#g-a)"/>
+        <text class="l" x="600" y="262" text-anchor="middle">static frames below base_footprint</text>
+        <line class="e" x1="416" y1="296" x2="888" y2="296" marker-end="url(#g-a)"/>
+        <text class="l" x="650" y="290" text-anchor="middle">PointCloud2 in frame os_sensor</text>
+
+        <!-- /tf_old dead end -->
+        <line class="e dash" x1="416" y1="350" x2="452" y2="350"/>
+        <text class="l" x="458" y="354">✕ nobody subscribes: robot's own odom → base_footprint, wheels, imu_madgwick</text>
+      </svg>
+    </div>
+    <figcaption>The remap is the trick of step 2: the bag's <code>/tf</code> already contains the robot's own <code>odom → base_footprint</code>, and a TF frame can only have one parent. Renaming that topic to <code>/tf_old</code> leaves <code>base_footprint</code> free for our <code>my_odom</code>. rqt_tf_tree also reads <code>/tf_static</code>; that arrow is left out to keep the drawing readable.</figcaption>
+  </figure>
+
+  <div class="callout">
+    <strong>QoS, as measured with <code>ros2 topic info /odom --verbose</code></strong>
+    <span>The bag player publishes <code>/odom</code> as <strong>Reliable</strong>. Our node subscribes with <code>SensorDataQoS()</code>, which is <strong>Best Effort</strong>. That pairing connects. The reverse pairing would not: a Reliable subscriber gets nothing from a Best-Effort publisher.</span>
+  </div>
+</section>
+
+<!-- ============================== TF TREE ============================== -->
+<section id="tf">
+  <div class="head">
+    <h2>The TF tree our node builds on</h2>
+    <p class="prose">Our node adds one edge at the top. Everything below <code>base_footprint</code> comes from the bag's <code>/tf_static</code> and never moves relative to the robot. RViz chains these transforms to place the lidar points in <code>my_odom</code>.</p>
+  </div>
+  <figure>
+    <div class="legend" aria-hidden="true">
+      <span><i class="sw o"></i>dynamic, ours, on /tf, sent with every /odom message</span>
+      <span><i class="sw"></i>static, from the bag's /tf_static</span>
+      <span><i class="sw d"></i>removed by the remap</span>
+    </div>
+    <div class="dg-scroll">
+      <svg class="dg" viewBox="0 0 1000 490" role="img" aria-label="TF tree: my_odom is the parent of base_footprint, sent by our node. base_footprint has children base_link and spraying_application_link. base_link has chassis_link and av_camera_link. chassis_link has platform_link, which has imu_phidget, os1_32_base_plate_link with os_sensor below it, gps_link, and camera_bottom_screw_frame with camera_link below it. The robot's own odom frame is cut off by the remap.">
+        <!-- edges first -->
+        <path class="eo" d="M500,54 V96"/>
+        <path class="e dash" d="M760,54 V110 H564"/>
+        <path class="e" d="M500,124 V145 H380 V166"/>
+        <path class="e" d="M500,145 H680 V166"/>
+        <path class="e" d="M380,194 V215 H290 V236"/>
+        <path class="e" d="M380,215 H520 V236"/>
+        <path class="e" d="M290,264 V306"/>
+        <path class="e" d="M290,334 V360 H90 V386"/>
+        <path class="e" d="M290,360 H300 V386"/>
+        <path class="e" d="M300,360 H500 V386"/>
+        <path class="e" d="M500,360 H740 V386"/>
+        <path class="e" d="M300,414 V446"/>
+        <path class="e" d="M740,414 V446"/>
+
+        <!-- frames -->
+        <rect class="ours" x="463" y="26" width="74" height="28" rx="5"/>
+        <text x="500" y="44" text-anchor="middle">my_odom</text>
+        <text class="lo" x="452" y="44" text-anchor="end">parameter frame_name</text>
+        <text class="lo" x="512" y="80">our node, updated 50× per second</text>
+
+        <rect class="ghost" x="733" y="26" width="54" height="28" rx="5"/>
+        <text class="l" x="760" y="44" text-anchor="middle">odom</text>
+        <text class="l" x="772" y="84">only on /tf_old now</text>
+
+        <rect class="frame" x="437" y="96" width="126" height="28" rx="5"/>
+        <text x="500" y="114" text-anchor="middle">base_footprint</text>
+        <text class="l" x="428" y="114" text-anchor="end">child_frame_id of /odom</text>
+
+        <rect class="frame" x="335" y="166" width="90" height="28" rx="5"/>
+        <text x="380" y="184" text-anchor="middle">base_link</text>
+        <rect class="frame" x="578" y="166" width="204" height="28" rx="5"/>
+        <text x="680" y="184" text-anchor="middle">spraying_application_link</text>
+
+        <rect class="frame" x="235" y="236" width="110" height="28" rx="5"/>
+        <text x="290" y="254" text-anchor="middle">chassis_link</text>
+        <rect class="frame" x="457" y="236" width="126" height="28" rx="5"/>
+        <text x="520" y="254" text-anchor="middle">av_camera_link</text>
+        <text class="l" x="357" y="290">4 wheel links hang here on /tf_old</text>
+
+        <rect class="frame" x="231" y="306" width="118" height="28" rx="5"/>
+        <text x="290" y="324" text-anchor="middle">platform_link</text>
+
+        <rect class="frame" x="38" y="386" width="104" height="28" rx="5"/>
+        <text x="90" y="404" text-anchor="middle">imu_phidget</text>
+        <text class="l" x="90" y="432" text-anchor="middle">/imu/data_raw</text>
+        <text class="l" x="90" y="448" text-anchor="middle">yaw +90° to base</text>
+
+        <rect class="frame" x="209" y="386" width="182" height="28" rx="5"/>
+        <text x="300" y="404" text-anchor="middle">os1_32_base_plate_link</text>
+        <rect class="frame" x="459" y="386" width="82" height="28" rx="5"/>
+        <text x="500" y="404" text-anchor="middle">gps_link</text>
+        <rect class="frame" x="638" y="386" width="204" height="28" rx="5"/>
+        <text x="740" y="404" text-anchor="middle">camera_bottom_screw_frame</text>
+
+        <rect class="frame" x="255" y="446" width="90" height="28" rx="5"/>
+        <text x="300" y="464" text-anchor="middle">os_sensor</text>
+        <text class="l" x="354" y="464">lidar, /ouster/points</text>
+        <rect class="frame" x="688" y="446" width="104" height="28" rx="5"/>
+        <text x="740" y="464" text-anchor="middle">camera_link</text>
+      </svg>
+    </div>
+    <figcaption>The bag's <code>/tf</code> (now <code>/tf_old</code>) also carried <code>chassis_link →</code> four wheel links (front and rear, left and right) and <code>imu_phidget → imu_madgwick</code>. Four wheels driven like a differential drive means skid steering: the wheels have to slide sideways in every turn, which is the slip the IMU test below measures.</figcaption>
+  </figure>
+</section>
+
+<!-- ============================== NODE ============================== -->
+<section id="node">
+  <div class="head">
+    <h2>Inside the node</h2>
+    <p class="prose">The node is one class. Its constructor wires up the ROS interfaces, two callbacks do the work, and one helper sends the transform. All of it lives in <code>src/odom_transform_node.cpp</code>.</p>
+  </div>
+
+  <figure>
+    <div class="dg-scroll">
+      <svg class="dg" viewBox="0 0 1000 250" role="img" aria-label="Inside the node: /odom messages trigger on_odom, /imu/data_raw messages trigger on_imu. on_imu adds gyro samples to member state, on_odom reads them, updates the pose and calls publish_transform, which sends /tf. rclcpp::spin runs one callback at a time.">
+        <defs>
+          <marker id="n-a" viewBox="0 0 8 8" refX="8" refY="4" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path class="ah" d="M0,0 L8,4 L0,8 z"/></marker>
+          <marker id="n-ao" viewBox="0 0 8 8" refX="8" refY="4" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto"><path class="aho" d="M0,0 L8,4 L0,8 z"/></marker>
+        </defs>
+        <rect class="topic" x="16" y="52" width="170" height="36" rx="18"/>
+        <text x="101" y="74" text-anchor="middle">/odom · 50 Hz</text>
+        <rect class="topic" x="16" y="152" width="170" height="36" rx="18" stroke-dasharray="5 4"/>
+        <text x="101" y="174" text-anchor="middle">/imu/data_raw · 125 Hz</text>
+        <line class="e" x1="186" y1="70" x2="248" y2="70" marker-end="url(#n-a)"/>
+        <line class="e dash" x1="186" y1="170" x2="248" y2="170" marker-end="url(#n-a)"/>
+
+        <rect class="ours" x="250" y="50" width="160" height="40" rx="6"/>
+        <text x="330" y="75" text-anchor="middle">on_odom()</text>
+        <rect class="ours" x="250" y="150" width="160" height="40" rx="6"/>
+        <text x="330" y="175" text-anchor="middle">on_imu()</text>
+
+        <rect class="ext" x="490" y="40" width="240" height="170" rx="6"/>
+        <text class="t" x="610" y="62" text-anchor="middle">member state</text>
+        <text x="506" y="88">x_, y_, yaw_</text>
+        <text x="506" y="110">last_stamp_</text>
+        <text x="506" y="132">base_frame_</text>
+        <text x="506" y="166">imu_yaw_rate_sum_,</text>
+        <text x="506" y="182">imu_samples_</text>
+        <text x="506" y="202">imu_to_base_</text>
+
+        <line class="e" x1="410" y1="80" x2="488" y2="80" marker-end="url(#n-a)"/>
+        <text class="l" x="449" y="73" text-anchor="middle">updates</text>
+        <line class="e" x1="410" y1="172" x2="488" y2="172" marker-end="url(#n-a)"/>
+        <text class="l" x="449" y="165" text-anchor="middle">adds</text>
+
+        <path class="eo" d="M330,50 V22 H890 V48" marker-end="url(#n-ao)"/>
+        <text class="lo" x="610" y="16" text-anchor="middle">calls publish_transform() at the end of every on_odom()</text>
+
+        <rect class="ours" x="800" y="50" width="180" height="40" rx="6"/>
+        <text x="890" y="75" text-anchor="middle">publish_transform()</text>
+        <line class="e" x1="730" y1="80" x2="798" y2="80" marker-end="url(#n-a)"/>
+        <text class="l" x="764" y="73" text-anchor="middle">reads</text>
+
+        <line class="eo" x1="890" y1="90" x2="890" y2="148" marker-end="url(#n-ao)"/>
+        <text class="lo" x="898" y="124">sendTransform</text>
+        <rect class="ours" x="840" y="150" width="100" height="30" rx="15"/>
+        <text x="890" y="170" text-anchor="middle">/tf</text>
+
+        <text class="l" x="16" y="238">rclcpp::spin() runs one callback at a time in one thread, so on_odom and on_imu never touch the state at the same moment.</text>
+      </svg>
+    </div>
+    <figcaption>Dashed parts only exist with <code>use_imu:=true</code>. on_imu collects gyro readings between two odometry messages; on_odom averages and resets them.</figcaption>
+  </figure>
+
+  <div class="walk">
+    <div class="explain">
+      <span class="step-no">Steps 3, 4, 7, 8 · constructor</span>
+      <h3>Wiring up</h3>
+      <ul>
+        <li><code>declare_parameter</code> reads <code>frame_name</code>, <code>use_imu</code> and <code>standstill_speed</code>, so you can set them with <code>--ros-args -p name:=value</code>.</li>
+        <li><code>TransformBroadcaster</code> publishes on <code>/tf</code>. The sheet links the static one, but that goes to <code>/tf_static</code> and is meant for frames that never move.</li>
+        <li><code>std::bind(&amp;OdomTransformNode::on_odom, this, _1)</code> turns the member function into a callback; <code>_1</code> is the incoming message.</li>
+        <li>The IMU subscription and TF listener are only created when <code>use_imu</code> is true.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="bar"><span>src/odom_transform_node.cpp</span><span>lines 26–62</span></div>
+<pre><code class="language-cpp">  OdomTransformNode()
+  : Node("odom_transform_node")
+  {
+    // Step 7: name of the new odom frame, e.g. --ros-args -p frame_name:=my_odom
+    frame_name_ = declare_parameter&lt;std::string&gt;("frame_name", "my_odom");
+
+    // Step 8 (optional): while linear.x == 0 (turning on the spot), take the
+    // yaw rate from the IMU gyro instead of the wheel odometry.
+    // In dlg_feldtage_24:cut the wheels still report ~0.02 m/s during the turn
+    // on the spot, so a strict == 0 would almost never switch to the IMU.
+    use_imu_ = declare_parameter&lt;bool&gt;("use_imu", false);
+    standstill_speed_ = declare_parameter&lt;double&gt;("standstill_speed", 0.05);
+
+    // TransformBroadcaster, not StaticTransformBroadcaster: the pose changes
+    // with every odometry message. Static transforms go to /tf_static and are
+    // meant for frames that never move (e.g. sensor mounts).
+    tf_broadcaster_ = std::make_unique&lt;tf2_ros::TransformBroadcaster&gt;(*this);
+
+    // Best effort is compatible with both reliable and best-effort publishers.
+    odom_sub_ = create_subscription&lt;nav_msgs::msg::Odometry&gt;(
+      "odom", rclcpp::SensorDataQoS(),
+      std::bind(&amp;OdomTransformNode::on_odom, this, _1));
+
+    if (use_imu_) {
+      // Only needed to rotate the gyro reading from the IMU frame into the
+      // robot frame (static transform from the bag's /tf_static).
+      tf_buffer_ = std::make_unique&lt;tf2_ros::Buffer&gt;(get_clock());
+      tf_listener_ = std::make_shared&lt;tf2_ros::TransformListener&gt;(*tf_buffer_);
+      imu_sub_ = create_subscription&lt;sensor_msgs::msg::Imu&gt;(
+        "imu/data_raw", rclcpp::SensorDataQoS(),
+        std::bind(&amp;OdomTransformNode::on_imu, this, _1));
+    }
+
+    RCLCPP_INFO(
+      get_logger(), "Publishing TF %s -&gt; &lt;odom child_frame_id&gt;, IMU yaw rate %s",
+      frame_name_.c_str(), use_imu_ ? "on" : "off");
+  }</code></pre>
+    </div>
+  </div>
+
+  <div class="walk">
+    <div class="explain">
+      <span class="step-no">Step 3 · on_odom()</span>
+      <h3>Integrating the pose</h3>
+      <ul>
+        <li><code>dt</code> comes from the message stamps, not the wall clock, so it is right even when the bag plays faster.</li>
+        <li>If the new stamp is older than the last one, the bag looped: the pose resets to the origin.</li>
+        <li>With <code>use_imu</code> and the robot (nearly) standing still, ω comes from the averaged gyro samples instead of the wheels.</li>
+        <li>The midpoint rule uses the heading halfway through the time step, which is more accurate in curves than the plain Euler step.</li>
+      </ul>
+<div class="formula">θ_mid = θ + ω·dt/2
+x    += v · cos(θ_mid) · dt
+y    += v · sin(θ_mid) · dt
+θ    += ω · dt          (wrapped to ±π)</div>
+    </div>
+    <div class="code">
+      <div class="bar"><span>src/odom_transform_node.cpp</span><span>lines 65–106</span></div>
+<pre><code class="language-cpp">  void on_odom(const nav_msgs::msg::Odometry::SharedPtr msg)
+  {
+    // Some drivers leave child_frame_id empty; TF rejects empty frame names.
+    base_frame_ = msg-&gt;child_frame_id.empty() ? "base_link" : msg-&gt;child_frame_id;
+
+    const rclcpp::Time stamp(msg-&gt;header.stamp);
+    if (last_stamp_ &amp;&amp; stamp &lt; *last_stamp_) {
+      // Time jumped back: the bagfile started its next loop.
+      RCLCPP_INFO(get_logger(), "Time jumped back, resetting pose to the origin");
+      x_ = 0.0;
+      y_ = 0.0;
+      yaw_ = 0.0;
+    } else if (last_stamp_) {
+      const double dt = (stamp - *last_stamp_).seconds();
+      const double v = msg-&gt;twist.twist.linear.x;
+      double omega = msg-&gt;twist.twist.angular.z;
+
+      bool omega_from_imu = false;
+      if (use_imu_ &amp;&amp; std::abs(v) &lt; standstill_speed_ &amp;&amp; imu_samples_ &gt; 0) {
+        omega = imu_yaw_rate_sum_ / imu_samples_;
+        omega_from_imu = true;
+      }
+
+      if (dt &gt; 0.0) {
+        // Midpoint rule: use the heading halfway through the interval.
+        const double yaw_mid = yaw_ + 0.5 * omega * dt;
+        x_ += v * std::cos(yaw_mid) * dt;
+        y_ += v * std::sin(yaw_mid) * dt;
+        yaw_ = std::atan2(std::sin(yaw_ + omega * dt), std::cos(yaw_ + omega * dt));
+      }
+
+      RCLCPP_INFO_THROTTLE(
+        get_logger(), *get_clock(), 2000,
+        "x=%.2f m  y=%.2f m  yaw=%.1f deg  (v=%.2f m/s, omega=%.2f rad/s from %s)",
+        x_, y_, yaw_ * 180.0 / M_PI, v, omega, omega_from_imu ? "IMU" : "odom");
+    }
+    last_stamp_ = stamp;
+    imu_yaw_rate_sum_ = 0.0;
+    imu_samples_ = 0;
+
+    publish_transform(msg-&gt;header.stamp);
+  }</code></pre>
+    </div>
+  </div>
+
+  <div class="walk">
+    <div class="explain">
+      <span class="step-no">Step 8, optional · on_imu()</span>
+      <h3>Gyro into the robot frame</h3>
+      <ul>
+        <li>The IMU is mounted in frame <code>imu_phidget</code>, turned 90° about z. Its z axis still points up, but the code does not rely on that.</li>
+        <li>The first message looks up the rotation <code>imu_phidget → base_footprint</code> from <code>/tf_static</code> once and caches it in <code>imu_to_base_</code>.</li>
+        <li><code>quatRotate</code> turns the gyro vector into the robot frame; only its z part (yaw rate) is kept.</li>
+        <li>The gyro measures angular <em>velocity</em>, even though the sheet says "Winkelbeschleunigungen".</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="bar"><span>src/odom_transform_node.cpp</span><span>lines 108–138</span></div>
+<pre><code class="language-cpp">  void on_imu(const sensor_msgs::msg::Imu::SharedPtr msg)
+  {
+    if (base_frame_.empty()) {
+      return;  // no odometry yet, robot frame unknown
+    }
+
+    if (!imu_to_base_) {
+      if (msg-&gt;header.frame_id.empty() || msg-&gt;header.frame_id == base_frame_) {
+        imu_to_base_ = tf2::Quaternion::getIdentity();
+      } else {
+        try {
+          const auto t = tf_buffer_-&gt;lookupTransform(
+            base_frame_, msg-&gt;header.frame_id, tf2::TimePointZero);
+          imu_to_base_ = tf2::Quaternion(
+            t.transform.rotation.x, t.transform.rotation.y,
+            t.transform.rotation.z, t.transform.rotation.w);
+        } catch (const tf2::TransformException &amp; e) {
+          RCLCPP_WARN_THROTTLE(
+            get_logger(), *get_clock(), 5000, "No transform %s -&gt; %s yet: %s",
+            msg-&gt;header.frame_id.c_str(), base_frame_.c_str(), e.what());
+          return;
+        }
+      }
+    }
+
+    const tf2::Vector3 gyro_imu(
+      msg-&gt;angular_velocity.x, msg-&gt;angular_velocity.y, msg-&gt;angular_velocity.z);
+    const tf2::Vector3 gyro_base = tf2::quatRotate(*imu_to_base_, gyro_imu);
+    imu_yaw_rate_sum_ += gyro_base.z();
+    ++imu_samples_;
+  }</code></pre>
+    </div>
+  </div>
+
+  <div class="walk">
+    <div class="explain">
+      <span class="step-no">Step 4 · publish_transform()</span>
+      <h3>Sending the transform</h3>
+      <ul>
+        <li><code>header.frame_id</code> is the parent (<code>my_odom</code>), <code>child_frame_id</code> the robot (<code>base_footprint</code>).</li>
+        <li>The stamp is copied from the odometry message, so RViz matches it with the point clouds from the same moment.</li>
+        <li>TF stores rotations as quaternions; <code>setRPY(0, 0, yaw)</code> builds one from the 2D heading.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="bar"><span>src/odom_transform_node.cpp</span><span>lines 140–158</span></div>
+<pre><code class="language-cpp">  void publish_transform(const builtin_interfaces::msg::Time &amp; stamp)
+  {
+    geometry_msgs::msg::TransformStamped transform;
+    transform.header.stamp = stamp;
+    transform.header.frame_id = frame_name_;
+    transform.child_frame_id = base_frame_;
+    transform.transform.translation.x = x_;
+    transform.transform.translation.y = y_;
+    transform.transform.translation.z = 0.0;
+
+    tf2::Quaternion rotation;
+    rotation.setRPY(0.0, 0.0, yaw_);
+    transform.transform.rotation.x = rotation.x();
+    transform.transform.rotation.y = rotation.y();
+    transform.transform.rotation.z = rotation.z();
+    transform.transform.rotation.w = rotation.w();
+
+    tf_broadcaster_-&gt;sendTransform(transform);
+  }</code></pre>
+    </div>
+  </div>
+
+  <div class="walk">
+    <div class="explain">
+      <span class="step-no">main()</span>
+      <h3>Starting the node</h3>
+      <ul>
+        <li><code>rclcpp::spin</code> blocks and runs the callbacks one after another in a single thread until Ctrl+C.</li>
+        <li>That single thread is why the state needs no mutex. With a <code>MultiThreadedExecutor</code> it would.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="bar"><span>src/odom_transform_node.cpp</span><span>lines 185–191</span></div>
+<pre><code class="language-cpp">int main(int argc, char ** argv)
+{
+  rclcpp::init(argc, argv);
+  rclcpp::spin(std::make_shared&lt;OdomTransformNode&gt;());
+  rclcpp::shutdown();
+  return 0;
+}</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== TESTS ============================== -->
+<section id="tests">
+  <div class="head">
+    <h2>What was tested</h2>
+    <p class="prose">Every check ran against <code>dlg_feldtage_24:cut</code> on 4 November 2026, headless in Ubuntu. RViz and rqt_tf_tree were not opened; TF was checked with <code>tf2_echo</code>.</p>
+  </div>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Check</th><th>How</th><th>Result</th></tr></thead>
+      <tbody>
+        <tr><td>Build</td><td class="mono">colcon build --packages-select odom_transform</td><td><span class="pass">Pass</span> · no compiler warnings</td></tr>
+        <tr><td>Subscription connects</td><td class="mono">ros2 topic info /odom --verbose</td><td><span class="pass">Pass</span> · Reliable publisher, Best-Effort subscriber</td></tr>
+        <tr><td>Transform on /tf</td><td class="mono">tf2_echo my_odom base_footprint</td><td><span class="pass">Pass</span> · pose updates while the bag plays</td></tr>
+        <tr><td>Parameter frame_name</td><td class="mono">-p frame_name:=test_frame</td><td><span class="pass">Pass</span> · tf2_echo test_frame base_footprint</td></tr>
+        <tr><td>Reset on bag loop</td><td class="mono">bag at 10× speed</td><td><span class="pass">Pass</span> · "Time jumped back" every loop, pose back at 0, 0</td></tr>
+        <tr><td>Integration is correct</td><td>offline, against the robot's own <code>pose.pose</code></td><td><span class="pass">Pass</span> · identical end pose, see below</td></tr>
+        <tr><td>IMU mode</td><td class="mono">-p use_imu:=true</td><td><span class="pass">Pass</span> · lookup imu_phidget → base_footprint found, log shows "from IMU"</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>End of the 40 s bag</th><th>x</th><th>y</th><th>Heading</th></tr></thead>
+      <tbody>
+        <tr><td>Our node, wheels only</td><td class="num">3.38 m</td><td class="num">−26.37 m</td><td class="num">−86.6°</td></tr>
+        <tr><td>Robot's own odometry (<code>pose.pose</code>)</td><td class="num">3.38 m</td><td class="num">−26.37 m</td><td class="num">−86.6°</td></tr>
+        <tr><td>IMU at standstill, threshold 0.001 m/s</td><td class="num">3.25 m</td><td class="num">−26.38 m</td><td class="num">−86.8°</td></tr>
+        <tr><td>IMU at standstill, threshold 0.05 m/s (default)</td><td class="num">1.76 m</td><td class="num">−26.37 m</td><td class="num">−90.1°</td></tr>
+        <tr><td>Gyro alone, whole bag</td><td class="num">–</td><td class="num">–</td><td class="num">−90.5°</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="prose">The robot drives about 2.5 m, stops, turns about −84° on the spot, then drives about 25 m straight. The wheels count about 4° less turning than the gyro measures. During the turn the wheels still report around 0.02 m/s, so the sheet's literal <code>linear.x == 0</code> almost never hands over to the IMU; at 0.05 m/s it does. Over 25 m of driving, a 4° heading error already shifts the end point by about 1.6 m sideways, which is the 3.38 m versus 1.76 m in x.</p>
+</section>
+
+<!-- ============================== RUN ============================== -->
+<section id="run">
+  <div class="head">
+    <h2>Run it yourself</h2>
+    <p class="prose">Open one Ubuntu terminal per command, with <code>wsl -d Ubuntu-24.04</code> or the Ubuntu-24.04 entry in Windows Terminal. ROS and the workspace are already sourced.</p>
+  </div>
+  <div class="cmds">
+    <div class="cmd">
+      <span class="label">Terminal 1 · play the bag (step 2)</span>
+      <div class="box"><pre id="c1">ros2 bag play $(marina resolve dlg_feldtage_24:cut) --loop --remap /tf:=/tf_old</pre><button type="button" data-copy="c1">Copy</button></div>
+    </div>
+    <div class="cmd">
+      <span class="label">Terminal 2 · start the node (steps 3, 4, 7)</span>
+      <div class="box"><pre id="c2">ros2 run odom_transform odom_transform_node --ros-args -p frame_name:=my_odom</pre><button type="button" data-copy="c2">Copy</button></div>
+      <span class="hint">Add <code>-p use_imu:=true</code> for step 8. Every 2 s it logs x, y, heading and where ω came from.</span>
+    </div>
+    <div class="cmd">
+      <span class="label">Terminal 3 · TF tree (step 5)</span>
+      <div class="box"><pre id="c3">ros2 run rqt_tf_tree rqt_tf_tree</pre><button type="button" data-copy="c3">Copy</button></div>
+    </div>
+    <div class="cmd">
+      <span class="label">Terminal 4 · RViz (step 6)</span>
+      <div class="box"><pre id="c4">rviz2</pre><button type="button" data-copy="c4">Copy</button></div>
+      <span class="hint">Set Fixed Frame to <code>my_odom</code>, then Add → By topic → <code>/ouster/points</code> PointCloud2, and Add → By display type → TF.</span>
+    </div>
+    <div class="cmd">
+      <span class="label">After changing the code · rebuild</span>
+      <div class="box"><pre id="c5">cd /mnt/e/aufgaben-public/ros2_ws &amp;&amp; colcon build --packages-select odom_transform &amp;&amp; source install/setup.bash</pre><button type="button" data-copy="c5">Copy</button></div>
+    </div>
+  </div>
+</section>
+
+<footer>Answers to the two questions on the sheet, in German, are in <code>ros2_ws/ANTWORTEN.md</code>. For the submission, copy <code>ros2_ws/src/odom_transform</code> into your group repo on GitLab and push it.</footer>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cmake.min.js"></script>
+<script>
+  if (window.hljs) {
+    try { window.hljs.highlightAll(); } catch (e) { /* plain text stays readable */ }
+  }
+  document.querySelectorAll("button[data-copy]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var pre = document.getElementById(btn.getAttribute("data-copy"));
+      var text = pre.textContent;
+      function selectFallback() {
+        var range = document.createRange();
+        range.selectNodeContents(pre);
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+        btn.textContent = "Selected";
+      }
+      try {
+        navigator.clipboard.writeText(text).then(function () {
+          btn.textContent = "Copied";
+          setTimeout(function () { btn.textContent = "Copy"; }, 1500);
+        }, selectFallback);
+      } catch (e) { selectFallback(); }
+    });
+  });
+</script>
