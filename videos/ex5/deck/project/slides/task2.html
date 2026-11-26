@@ -1,0 +1,18 @@
+<section id="task2">
+<div class="head">
+<p class="eyebrow">TASK 2 · LINES 384–392</p>
+<h2>The initial guess: where ICP starts looking</h2>
+</div>
+<div class="row">
+<div class="col2">
+<p class="code"><span class="k">double</span> vx = state_.x(3); <span class="c">// speed v</span><br><span class="k">double</span> w &#160;= state_.x(4); <span class="c">// turn rate ω</span><br><br>guess_robot_base(0) = vx * dt_scan; <span class="c">// forward [m]</span><br>guess_robot_base(1) = 0.0; &#160; &#160; &#160; &#160; <span class="c">// sideways [m]</span><br>guess_robot_base(2) = w * dt_scan; &#160;<span class="c">// turn [rad]</span></p>
+<div class="card cpp"><p class="tag">C++</p><p>state_.x(3) is entry 3, counting from 0: x, y, θ, v, ω, a.</p></div>
+</div>
+<div class="col">
+<div class="card why"><p class="tag">WHY FROM THE FILTER</p><p>It combines wheels, gyro and ICP: the best estimate of the current motion. Raw wheels would carry slip in turns.</p></div>
+<div class="card why"><p class="tag">WHY SIDEWAYS 0</p><p>Wheels can’t slide sideways; on a curve the offset is ≈ v·dt·sin(ω·dt/2), under 1 mm at 20 scans per second.</p></div>
+<div class="card why"><p class="tag">WHY NO ACCELERATION</p><p>Over 50 ms, ½·a·dt² adds less than a millimetre.</p></div>
+</div>
+</div>
+<aside>TASK 2 comes right after TASK 1, still inside scanCallback. The new scan is now in the robot frame. Next, ICP in TASK 3 will shift the old scan until it lines up with the new one, and TASK 2 decides where that search starts. Why does the start matter? ICP only finds the nearest fit; if it starts far away from the real motion, it can lock onto the wrong fit. The guess starts from the Kalman filter’s state. Entry three is the speed and entry four is the turn rate; C++ counts from zero, so entry zero is x. We take them from the filter rather than from the raw wheels, because the filter combines wheels, gyroscope and ICP, so it’s our best estimate of how the robot is moving. The forward part is speed times the time since the last scan; with a scan every fifty milliseconds that’s about six and a half centimetres. We ignore the acceleration, because over fifty milliseconds it adds less than a millimetre. The sideways part is zero, because wheels can’t slide sideways. The turn is the turn rate times the time since the last scan. Testat question: why does pure-ICP mode start at zero? With icp_only the filter doesn’t run, so x(3) and x(4) stay zero, and ICP has to find the whole motion itself.</aside>
+</section>

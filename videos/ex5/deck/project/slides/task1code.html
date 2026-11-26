@@ -1,0 +1,17 @@
+<section id="task1code" class="alt">
+<div class="head">
+<p class="eyebrow">TASK 1 · LINES 308–329</p>
+<h2>getTransform, line by line</h2>
+</div>
+<div class="row">
+<div class="col2">
+<p class="code"><span class="k">bool</span> getTransform(<span class="k">const</span> std::string &amp;source_frame,<br>&#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; <span class="k">const</span> rclcpp::Time &amp;time, Eigen::Isometry3d &amp;T_out)<br>{<br>&#160; <span class="k">try</span> {<br>&#160; &#160; <span class="k">auto</span> tf_msg = tf_buffer_-&gt;lookupTransform(<br>&#160; &#160; &#160; &#160; base_frame_, source_frame, time,<br>&#160; &#160; &#160; &#160; rclcpp::Duration::from_seconds(0.1));<br>&#160; &#160; T_out = tf2::transformToEigen(tf_msg);<br>&#160; &#160; <span class="k">return</span> true;<br>&#160; } <span class="k">catch</span> (<span class="k">const</span> tf2::TransformException &amp;ex) {<br>&#160; &#160; RCLCPP_WARN_THROTTLE(…, 2000, …);<br>&#160; &#160; <span class="k">return</span> false;<br>&#160; }<br>}</p>
+</div>
+<div class="col">
+<div class="card cpp"><p class="tag">C++</p><p>&amp; works on the caller’s own variable, no copy, so T_out can be filled in. try/catch: if the lookup fails, jump to catch instead of crashing. a-&gt;f() calls f on the object a points to.</p></div>
+<div class="card"><h3>the arguments</h3><p>1 target base_frame_ · 2 source: the sensor · 3 the message’s own time stamp · 4 wait at most 0.1 s</p></div>
+<div class="card"><h3>the result</h3><p>an Eigen isometry, rotation + shift: p_robot = T · p_sensor</p></div>
+</div>
+</div>
+<aside>First, the signature. The function gets three things: the name of the sensor’s frame, the time the data was measured, and an empty transform called T_out, which it fills in. It returns true if that worked and false if not. In C++, bool means true or false, and the ampersand means the function works on the caller’s own variable instead of a copy, which is how it can fill in T_out. Next comes the try block: if something inside try fails, the program jumps to the matching catch block instead of crashing. Here the lookup fails when TF has no answer yet, right after startup, before the static transforms have arrived. Inside the try block we ask the TF buffer for the transform. lookupTransform does the asking and the answer is stored in tf_msg. The first two arguments are the frames: the target comes first, base_footprint, the robot; the source second, the sensor. In this order, the result moves sensor points into the robot frame. The third argument is the message’s own time stamp, and the last says how long to wait: at most a tenth of a second. Then transformToEigen turns the message into an Eigen isometry, a rotation plus a shift, and the function returns true. If anything went wrong, we land in the catch block, print a throttled warning, and return false.</aside>
+</section>

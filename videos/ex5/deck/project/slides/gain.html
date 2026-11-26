@@ -1,0 +1,18 @@
+<section id="gain">
+<div class="head">
+<p class="eyebrow">FUSION · LINES 432–454</p>
+<h2>icp_gain and the Kalman update</h2>
+</div>
+<div class="row">
+<div class="col2">
+<p class="code">Ez(0, 0) = sigma_v * sigma_v; &#160;<span class="c">// variance = σ²</span><br>Ez(1, 1) = sigma_w * sigma_w;<br><span class="k">if</span> (icp_gain_ &gt; 1e-6) Ez /= icp_gain_;<br><br>S = H * Ex * Hᵀ + Ez; &#160; &#160; &#160; &#160;<span class="c">// uncertainty of the difference</span><br>K = Ex * Hᵀ * S⁻¹; &#160; &#160; &#160; &#160; &#160; <span class="c">// Kalman gain</span><br>x += K * (z - H * x); &#160; &#160; &#160; &#160;<span class="c">// measured − expected</span><br>Ex = (I - K H) Ex (I - K H)ᵀ + K Ez Kᵀ; <span class="c">// Joseph form</span></p>
+<div class="card cpp"><p class="tag">C++</p><p>x /= y means x = x / y.</p></div>
+</div>
+<div class="col">
+<div class="card"><h3>on the bag</h3><p>σ_v ≈ 3.3 m/s: the speed comes from the wheels. σ_ω ≈ 0.15 rad/s: ICP still counts for the turn rate.</p></div>
+<div class="card"><h3>icp_gain (simulation)</h3><p>0.01 → 2.0 m end error · 2 → 4.5 m · 10 → 9.9 m. It can’t fix sliding; it only changes the trust.</p></div>
+<div class="card why"><p class="tag">WHY JOSEPH FORM</p><p>Stays symmetric and positive even with rounding errors.</p></div>
+</div>
+</div>
+<aside>The variances go into Ez: sigma squared. Then Ez is divided by icp_gain. A gain of two halves the variance, so ICP counts twice as much. In C++, slash-equals means divide and store. On the bag, sigma v is about three metres per second, so the speed comes from the wheels, while ICP still counts for the turn rate. The update is the usual Kalman correction: S is the uncertainty of the difference, K is the Kalman gain, and the innovation is measured minus expected. The covariance uses the Joseph form: it’s longer, but it stays symmetric and positive even with rounding errors; the short form (I − K H) Ex can lose symmetry. Testat question: what does icp_gain do, and what value would you choose? Ez is divided by it, so two means trust ICP twice as much. In the simulation with a corridor, a gain of 0.01 ended two metres off, two ended four and a half, and ten almost ten. The gain can’t fix sliding; it only changes how much the filter listens. On the open field, keep it at two or below.</aside>
+</section>

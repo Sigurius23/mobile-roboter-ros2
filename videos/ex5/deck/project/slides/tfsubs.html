@@ -1,0 +1,18 @@
+<section id="tfsubs" class="alt">
+<div class="head">
+<p class="eyebrow">01 · THE CONSTRUCTOR · LINES 82–96</p>
+<h2>TF objects and three independent subscriptions</h2>
+</div>
+<div class="row">
+<div class="col2">
+<p class="code">tf_broadcaster_ = std::make_shared&lt;TransformBroadcaster&gt;(this);<br>tf_buffer_ &#160; &#160; = std::make_unique&lt;Buffer&gt;(get_clock());<br>tf_listener_ &#160; = std::make_shared&lt;TransformListener&gt;(*tf_buffer_);<br><br>odom_sub_ = create_subscription&lt;Odometry&gt;(<span class="n">"/odom"</span>,<br>&#160; &#160; QoS(KeepLast(10)).reliable(), bind(&amp;odomCallback, …));<br><span class="c">// same for imu_topic and "/ouster/scan"</span></p>
+<div class="card cpp"><p class="tag">C++</p><p>make_shared&lt;X&gt; creates an X and a pointer that frees it when nobody needs it any more.</p></div>
+</div>
+<div class="col">
+<div class="card"><h3>broadcaster</h3><p>publishes our result, the pose odom → base_footprint</p></div>
+<div class="card"><h3>buffer + listener</h3><p>store every transform from /tf and /tf_static; TASK 1 asks this buffer</p></div>
+<div class="card why"><p class="tag">WHY NO SYNCHRONIZER</p><p>A slow sensor never holds back a fast one, and no message is thrown away. KeepLast(10) + reliable: a short delay costs no measurements.</p></div>
+</div>
+</div>
+<aside>Next come the TF objects. The broadcaster publishes our result, the robot’s pose; other programs like RViz read it from TF. In C++, make_shared creates the object and a pointer to it that cleans up after itself. The buffer and the listener belong together: the buffer stores every transform it has heard about, and the listener subscribes to /tf and /tf_static and fills it. We need them because TASK 1 asks this buffer how each sensor is mounted. Then the subscriptions. create_subscription tells ROS: call me when a message arrives on the odom topic, and the function it calls is odomCallback. std::bind packs that member function together with this object so ROS can call it. Keep last ten means up to ten messages wait if the callback is busy; reliable means none get lost. The same follows for the IMU and the lidar scan. Why not wait for all three together, like the synchronizer in Exercise 4? Because then a slow sensor holds back a fast one, and messages that don’t fit get thrown away. Possible question: why a class instead of globals? The node’s memory stays together and private, callbacks become member functions that can reach it, and it’s the usual ROS 2 style.</aside>
+</section>

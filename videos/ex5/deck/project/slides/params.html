@@ -1,0 +1,22 @@
+<section id="params">
+<div class="head">
+<p class="eyebrow">01 · THE CONSTRUCTOR · LINES 57–62</p>
+<h2>Parameters: three modes, set from the launch file</h2>
+</div>
+<div class="row">
+<div class="col2">
+<p class="code"><span class="k">this</span>-&gt;declare_parameter(<span class="n">"icp_only"</span>, false);<br>icp_only_ = <span class="k">this</span>-&gt;get_parameter(<span class="n">"icp_only"</span>).as_bool();<br><span class="k">this</span>-&gt;declare_parameter(<span class="n">"use_icp"</span>, true);<br>use_icp_ = <span class="k">this</span>-&gt;get_parameter(<span class="n">"use_icp"</span>).as_bool();<br><span class="k">this</span>-&gt;declare_parameter(<span class="n">"icp_gain"</span>, 1.0);<br>icp_gain_ = <span class="k">this</span>-&gt;get_parameter(<span class="n">"icp_gain"</span>).as_double();</p>
+<div class="card cpp"><p class="tag">C++</p><p>this-&gt;f( … ) calls a function of this node. as_bool() reads the value as true or false.</p></div>
+</div>
+<div class="col">
+<table>
+<tr><th style="width:52%">use_icp / icp_only</th><th>mode</th></tr>
+<tr><td>false / false</td><td>wheels + gyro only (like Ex. 4)</td></tr>
+<tr><td>true / false</td><td>filter + ICP (default)</td></tr>
+<tr><td>any / true</td><td>ICP alone, no filter</td></tr>
+</table>
+<div class="card why"><p class="tag">WHY PARAMETERS</p><p>The launch file sets them, so you switch modes without recompiling. icp_gain sets how much the filter trusts ICP (Part 4).</p></div>
+</div>
+</div>
+<aside>The constructor runs once, when the node starts. First it declares a parameter called icp_only with the default false, then reads its value into a member variable. In C++, the arrow on this means: call a function of this node object. Why parameters at all? The launch file can set them, so you switch modes without recompiling. Two switches give three modes. icp_only means ICP alone, without the filter. use_icp means the filter with ICP added. With both off, the filter runs on wheels and gyroscope only, like in Exercise 4, which is useful to compare against. The third parameter, icp_gain, sets how much the filter trusts ICP. Part 4 shows what it does and which value to choose.</aside>
+</section>

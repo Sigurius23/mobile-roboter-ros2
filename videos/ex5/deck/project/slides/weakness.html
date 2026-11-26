@@ -1,0 +1,16 @@
+<section id="weakness" class="alt">
+<div class="head">
+<p class="eyebrow">A KNOWN WEAKNESS · NOT FIXED, BUT WORTH KNOWING</p>
+<h2>No predict before the ICP correction</h2>
+</div>
+<div class="row">
+<div class="col2">
+<p class="code"><span class="c">// odomCallback, line 221: predict first, then correct</span><br>state_ = predict(state_, dt);<br><br><span class="c">// scanCallback, line 396: straight to the correction</span><br><span class="k">auto</span> res = icp(last_cloud_base_, cloud_in_base, guess);<br><br><span class="c">// the fix: before the correction</span><br>state_ = predict(state_, (stamp - filter_time_).seconds());<br>filter_time_ = stamp;</p>
+</div>
+<div class="col">
+<div class="card warn"><p class="tag">WHAT HAPPENS</p><p>ICP corrects the state of the last odom or IMU message, a few milliseconds before the scan.</p></div>
+<div class="card why"><p class="tag">WHY IT BARELY MATTERS</p><p>The gap is a few ms (odom 50 Hz, IMU 125 Hz), and ICP measures speeds, which hardly change in a few ms.</p></div>
+</div>
+</div>
+<aside>Every odometry and IMU callback calls predict before it corrects. The scan callback doesn’t. So ICP corrects the state of the last odometry or IMU message, a few milliseconds before the scan was taken. In the odometry callback, predict moves the state to the message’s time before the correction. In scanCallback, the correction starts right after ICP, with no predict in between. Strictly, it should first predict to the scan’s time stamp and update filter_time_. Why it barely matters here: the gap is at most a few milliseconds, because odometry and IMU arrive fifty and a hundred and twenty five times a second. And ICP measures speeds, not a position, and a speed hardly changes in a few milliseconds, so the error is tiny. If you’re asked, name the fix: predict to the scan’s time first.</aside>
+</section>

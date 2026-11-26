@@ -1,0 +1,17 @@
+<section id="rviz">
+<div class="head">
+<p class="eyebrow">FILTER + ICP ON dlg_feldtage_24:cut · END OF THE DRIVE · SEEN FROM ABOVE</p>
+<h2>The node live in RViz</h2>
+</div>
+<div class="row">
+<img src="/_blob/c55bebaa342984f2a8e21c34e7f328ae" alt="RViz top-down view at the end of the drive: teal lidar points from all scans form a map of walls, fences and trees, and an orange path runs about 26 m across the field" style="width:875px; height:640px; object-fit:contain; border-radius:12px; border:2px solid #34444F">
+<div class="col">
+<p style="color:var(--teal)">teal: lidar scans, kept for 60 s</p>
+<p style="color:var(--amber)">orange: the path, TF odom → base_footprint</p>
+<p>axes: the frames odom and base_footprint</p>
+<p style="color:var(--green)">sharp walls: the motion and the scans agree</p>
+<p class="small">one grid square: 5 m · the path is about 26 m, like the wheels</p>
+</div>
+</div>
+<aside>Here is the node running on the real bag, seen from above; this is the last frame of the recording in the Part 5 video. The teal points are the lidar scans. RViz keeps each scan on screen for a minute, so together they draw a map of the field. The orange line is the robot’s path: the transform odom to base_footprint that our node publishes. The two small sets of axes are the frames odom, where the robot started, and base_footprint, the robot itself. Watch the walls and the fences: every scan is drawn where our node says the robot was. If the motion estimate were wrong, the same wall would show up twice, shifted or smeared. Here the walls stay mostly sharp, so the motion and the scans agree. One grid square is five metres; by the end the robot has driven about twenty six metres, the same distance the wheels measured.</aside>
+</section>

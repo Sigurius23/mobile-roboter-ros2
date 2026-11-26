@@ -1,0 +1,17 @@
+<section id="pure" class="alt">
+<div class="head">
+<p class="eyebrow">PURE-ICP MODE · LINES 457–472</p>
+<h2>Without the filter: ICP straight into the pose</h2>
+</div>
+<div class="row">
+<div class="col2">
+<p class="code"><span class="k">else if</span> (icp_only_)<br>{<br>&#160; <span class="k">auto</span> res = icp(last_cloud_base_, cloud_in_base, Vector3d::Zero());<br>&#160; <span class="k">double</span> c = cos(state_.x(2)), s = sin(state_.x(2));<br>&#160; state_.x(0) += c * delta(0) - s * delta(1);<br>&#160; state_.x(1) += s * delta(0) + c * delta(1);<br>&#160; state_.x(2) += delta(2);<br>&#160; publishTF(current_scan_stamp);<br>}<br>*last_cloud_base_ = *cloud_in_base; <span class="c">// in every mode</span></p>
+</div>
+<div class="col">
+<div class="card why"><p class="tag">WHY START AT ZERO</p><p>The filter doesn’t run in this mode, so there’s no speed to guess from.</p></div>
+<div class="card why"><p class="tag">WHY ROTATE BY θ</p><p>delta is in the robot frame; rotate it into odom before adding, as in Exercise 2.</p></div>
+<div class="card why"><p class="tag">WHY ALWAYS THE LATEST SCAN</p><p>Even if ICP failed: an ever older scan would make the gap, and the error, grow.</p></div>
+</div>
+</div>
+<aside>In pure-ICP mode the filter doesn’t run. ICP’s motion is added straight to the pose, and the node publishes it. Here ICP starts at zero, because the filter doesn’t run in this mode, so there’s no speed to guess from. The motion is in the robot’s frame: it’s rotated by the heading into the odom frame and added to the pose, like the odometry in Exercise 2. This branch publishes the transform itself. In every mode, at the end, the new scan becomes the old one, even if ICP failed. Comparing against an ever older scan would make the gap, and the error, grow.</aside>
+</section>

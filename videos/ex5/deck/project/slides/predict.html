@@ -1,0 +1,17 @@
+<section id="predict" class="alt">
+<div class="head">
+<p class="eyebrow">03 · PREDICT · LINES 157–166</p>
+<h2>predict: where is the robot after dt?</h2>
+</div>
+<div class="row">
+<div class="col2">
+<p class="code">A(0, 3) = c * dt; &#160; &#160; &#160; &#160; &#160;<span class="c">// x += cos θ · v · dt</span><br>A(0, 5) = c * 0.5 * dt * dt; <span class="c">// + ½ a dt²</span><br>A(1, 3) = ss * dt; &#160; &#160; &#160; &#160; <span class="c">// y += sin θ · v · dt</span><br>A(2, 4) = dt; &#160; &#160; &#160; &#160; &#160; &#160; &#160;<span class="c">// θ += ω · dt</span><br>A(3, 5) = dt; &#160; &#160; &#160; &#160; &#160; &#160; &#160;<span class="c">// v += a · dt</span><br><br>Eu.diagonal() &lt;&lt; 0.001, 0.001, 0.001, 0.05, 0.05, 0.5;<br>Eu *= dt; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; <span class="c">// noise grows with time</span></p>
+</div>
+<div class="col">
+<div class="card"><h3>the state: six numbers</h3><p>x, y, heading θ, speed v, turn rate ω, acceleration a. C++ counts from 0, so x(3) is v.</p></div>
+<div class="card why"><p class="tag">WHY COS AND SIN</p><p>The speed points along the heading; cos θ and sin θ split it into an x part and a y part. A starts as the identity: what isn’t set stays the same.</p></div>
+<div class="card why"><p class="tag">WHY Eu × dt</p><p>The longer we predict without a measurement, the less sure we can be.</p></div>
+</div>
+</div>
+<aside>Predict belongs to the Kalman filter. Every callback calls it first, to move the state forward to the time of its message; only then does it correct the state with the measurement. The state is six numbers: position x and y, the heading, the speed, the turn rate and the acceleration. Predict asks: if the robot keeps moving like this, where is it after dt seconds, and how much less sure are we? These lines fill the matrix A. Position x grows by the cosine of the heading, times speed, times dt; y grows by the sine. The acceleration adds one half a dt squared, the school physics formula. The heading grows by turn rate times dt and the speed by acceleration times dt. Everything else stays the same, because A starts as the identity. Eu is the process noise: how wrong the model may be per second. It’s multiplied by dt, because the longer we predict without a measurement, the less sure we can be. Question: why is predict called in every callback? Every measurement belongs to its own moment, so the state is moved to that moment first; that’s why all sensors share one filter_time_.</aside>
+</section>

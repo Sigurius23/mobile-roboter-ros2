@@ -1,0 +1,11 @@
+<section id="p5" class="parthead">
+<p class="eyebrow">PART 5</p>
+<p class="num">05</p>
+<h2>Live in RViz, and loose ends</h2>
+<ul>
+<li>the node running on the real bag, in RViz</li>
+<li>a known weakness: no predict before the ICP correction</li>
+<li>four more Testat questions</li>
+</ul>
+<aside>A short extra part. First the node running on the real bag, in RViz. Then a small weakness in the code that an examiner might ask about, and four more questions the first four parts left out. How the recording was made: pointcloud_to_laserscan cuts the slice with the launch file’s parameters; icp_node runs with use_icp true and icp_gain 2; the bag plays with --clock and its own /tf remapped to /tf_old. The bag already contains the robot’s recorded odom transform, and without the remap two publishers would fight over the same transform. RViz shows the scans, the frames and the path.</aside>
+</section>

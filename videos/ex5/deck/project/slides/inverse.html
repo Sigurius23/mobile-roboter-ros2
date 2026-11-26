@@ -1,0 +1,17 @@
+<section id="inverse" class="alt">
+<div class="head">
+<p class="eyebrow">TASK 3 · SET-UP · LINES 486–517</p>
+<h2>The inverse trick: ICP moves points, not the robot</h2>
+</div>
+<div class="row">
+<div class="col2">
+<p class="code">Eigen::Matrix3d T_guess_robot = Identity(); <span class="c">// "no motion"</span><br>T_guess_robot(0,0) = c_g; &#160;T_guess_robot(0,1) = -s_g;<br>T_guess_robot(0,2) = initial_guess_robot(0); <span class="c">// forward</span><br><span class="c">// … (1,0) = s_g, (1,1) = c_g, (1,2) = sideways</span><br>T_guess_point = T_guess_robot.inverse();<br><br><span class="c">// move every old point by the inverted guess</span><br>q.x = c0 * p.x - s0 * p.y + tx_gp;<br><br>T_total = T_guess_point; <span class="c">// all steps so far</span><br>kdtree.setInputCloud(tgt_cloud); <span class="c">// the new scan</span></p>
+</div>
+<div class="col">
+<div class="card"><h3>drive 1 m towards a wall…</h3><p>…and the wall comes 1 m closer. Points move the opposite way, so the guess is inverted.</p></div>
+<div class="card why"><p class="tag">WHY 3×3</p><p>Rotation and shift in one matrix; two motions combine by multiplying.</p></div>
+<div class="card why"><p class="tag">WHY THE TREE ON THE NEW SCAN</p><p>We search the new scan, and it never moves: one tree serves all 20 rounds.</p></div>
+</div>
+</div>
+<aside>The guess from TASK 2 says how the robot moved. But ICP moves the old points onto the new ones, and points move the opposite way: if you drive one metre towards a wall, the wall comes one metre closer. So the code turns the guess around before it starts. The guess becomes a three by three matrix, starting as the identity, which means no motion. Why three by three for a flat motion? It holds the rotation and the shift in one matrix, and two motions combine by simply multiplying their matrices. The cosine and minus sine of the guessed turn go top left, and the forward shift goes into the last column. Then it’s inverted: .inverse() turns the robot’s motion into the points’ motion. Every old point is moved by the inverted guess, rotate then shift, so ICP starts close to the answer and only fixes what the guess got wrong. T_total collects all steps and starts at the guess. Finally a kd-tree is built on the new scan. It finds the nearest point quickly, without checking all two hundred and fifty. It’s built on the new scan because that’s the set we search in, and the new scan never moves, so one tree serves all twenty rounds.</aside>
+</section>

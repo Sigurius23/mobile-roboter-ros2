@@ -1,0 +1,16 @@
+<section id="loop2">
+<div class="head">
+<p class="eyebrow">TASK 3 · STEPS 2–4 · LINES 541–569</p>
+<h2>Centres, the matrix H, and the best rotation</h2>
+</div>
+<div class="row">
+<div class="col2">
+<p class="code"><span class="c">// 2) centres: add up, divide by the count</span><br>src_mean /= static_cast&lt;<span class="k">double</span>&gt;(src_pts.size());<br><span class="c">// 3) cross-covariance of the centred pairs</span><br>H += (src_pts[i] - src_mean) * (tgt_pts[i] - tgt_mean).transpose();<br><span class="c">// 4) SVD gives the best rotation, then the shift</span><br>Eigen::JacobiSVD&lt;Matrix2d&gt; svd(H, ComputeFullU | ComputeFullV);<br>Matrix2d R = V * svd.matrixU().transpose();<br><span class="k">if</span> (R.determinant() &lt; 0) { V.col(1) *= -1.0; R = V * Uᵀ; }<br>Vector2d t = tgt_mean - R * src_mean;</p></div>
+<div class="col">
+<div class="card why"><p class="tag">WHY SUBTRACT THE CENTRES</p><p>It removes the shift: H only holds how the two shapes are turned.</p></div>
+<div class="card why"><p class="tag">WHY THE SVD</p><p>Kabsch method: the rotation that minimises Σ‖R s + t − t′‖² is R = V·Uᵀ, in closed form.</p></div>
+<div class="card why"><p class="tag">WHY det &lt; 0</p><p>Then R is a mirror image; flipping V’s last column gives the best real rotation.</p></div>
+</div>
+</div>
+<aside>Step two: the centres. The centre of the old points and the centre of their partners are just averages: add everything up, then divide by the count. static_cast turns the count into a decimal number; in C++ it’s the safe, explicit way to convert a type. Once the rotation is known, the shift is just the difference of the two centres. Step three: the matrix H. For every pair it takes the old point minus its centre, times the new point minus its centre turned into a row. Subtracting the centres removes the shift, so what’s left in H is only how the two shapes are turned against each other. Step four: the singular value decomposition splits H into U, sigma and V. This is the Kabsch method: it gives the best rotation directly, R equals V times U transposed, with no searching. One check: if R’s determinant is negative, R is a mirror image, not a rotation; flipping the last column of V gives the best real rotation. Then the shift is the new centre minus the rotated old centre. Testat question: where does R = V·Uᵀ come from? We want the rotation that makes the summed squared gaps smallest. With centred points that’s the same as maximising the trace of R times H, and the SVD gives that maximum at V Uᵀ.</aside>
+</section>

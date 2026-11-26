@@ -1,0 +1,16 @@
+<section id="time">
+<div class="head">
+<p class="eyebrow">02 · FIX 1 · LINES 195–202, 123–129</p>
+<h2>Time, and the reset when the bag loops</h2>
+</div>
+<div class="row">
+<div class="col2">
+<p class="code"><span class="k">double</span> dt = (t - filter_time_).seconds();<br><span class="k">if</span> (dt &lt; -kTimeJumpBack) <span class="c">// more than 1 s back</span><br>{<br>&#160; resetFilter(t); <span class="c">// origin, new time, forget last scan</span><br>&#160; <span class="k">return</span>;<br>}<br><span class="k">if</span> (dt &lt;= 0) <span class="c">// a few ms older: normal</span><br>&#160; <span class="k">return</span>;</p>
+<div class="card why"><p class="tag">WHY 1 SECOND, NOT 0</p><p>Odom (50 Hz) and IMU (125 Hz) interleave, so a few ms backwards happens all the time. 1 s is far above that jitter and far below the 40 s bag.</p></div>
+</div>
+<div class="col">
+<div class="card warn"><p class="tag">THE ORIGINAL</p><p>Returned on dt ≤ 0 without updating its stored time. After the loop every message looked too old: the robot froze at 44.5 s.</p></div>
+<div class="card"><h3>resetFilter does three things</h3><p>initialState(): back to the origin with the starting uncertainty · filter_time_ = t · have_last_scan_ = false, because a scan from the bag’s end against one from its start would look like a huge jump</p></div></div>
+</div>
+<aside>Every message carries a time stamp, the moment it was measured. The filter remembers the time of its last update and moves its state forward by the difference, dt. When you play the bag in a loop, time suddenly jumps back by forty seconds, and the original code didn’t handle that. The last check comes first: if dt is zero or negative, the message is a little older than the last one. That’s normal, because odometry at fifty hertz and IMU at a hundred and twenty five hertz arrive interleaved, so the message is simply skipped. A big jump back is different. If time goes back by more than kTimeJumpBack, one second, the bag has started over, and resetFilter starts again at the origin. The original returned here without updating its stored time; after the loop every message looked too old and the robot froze. resetFilter puts the state back to the origin with the starting uncertainty, takes the new time, and forgets the last scan. Question: why one second and not zero? A threshold of zero would reset constantly, because of the interleaving jitter.</aside>
+</section>

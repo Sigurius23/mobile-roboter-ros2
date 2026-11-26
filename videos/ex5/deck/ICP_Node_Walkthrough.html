@@ -1,0 +1,777 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content='width=device-width, initial-scale=1'><title>ICP Node Walkthrough</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400..700&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap"><style>:root {
+  --bg: #0F151B;
+  --bg2: #16202A;
+  --panel: #1C2731;
+  --code: #0A0F14;
+  --text: #E8EEF2;
+  --body: #C3CED6;
+  --muted: #94A4B1;
+  --amber: #FF8B4F;
+  --teal: #52C6DE;
+  --violet: #B9A2FB;
+  --green: #7BD389;
+  --red: #FF7A7A;
+}
+
+body { font-family: 'Inter', Arial, sans-serif; color: var(--text); }
+
+section {
+  padding: 128px;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+section.alt { background: var(--bg2); }
+section.statement { background: var(--amber); color: #1A1410; justify-content: center; }
+
+h1, h2, h3 { font-family: 'Rubik', Arial, sans-serif; margin: 0; }
+h1 { font-size: 104px; font-weight: 700; line-height: 1.05; }
+h2 { font-size: 60px; font-weight: 600; line-height: 1.1; }
+h3 { font-size: 36px; font-weight: 600; line-height: 1.2; color: var(--text); }
+p { margin: 0; font-size: 30px; line-height: 1.4; color: var(--body); }
+
+.head { display: flex; flex-direction: column; gap: 12px; }
+.eyebrow { font-size: 24px; font-weight: 600; letter-spacing: 3px; color: var(--amber); }
+.statement .eyebrow { color: #3A2210; }
+.statement h1 { color: #1A1410; }
+.statement .lead { color: #3A2210; font-size: 36px; }
+
+.lead { font-size: 34px; color: var(--body); }
+.small { font-size: 24px; color: var(--muted); }
+
+.row { display: flex; gap: 56px; flex: 1; }
+.col { display: flex; flex-direction: column; gap: 24px; flex: 1; }
+.col2 { display: flex; flex-direction: column; gap: 24px; flex: 1.4; }
+
+.code {
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 25px;
+  line-height: 1.55;
+  color: var(--text);
+  background: var(--code);
+  border: 2px solid #2C3A46;
+  border-radius: 14px;
+  padding: 28px 32px;
+}
+.code .c { color: #8FA3B3; }
+.code .k { color: var(--amber); }
+.code .n { color: var(--teal); }
+
+.card { background: var(--panel); border-radius: 16px; padding: 28px 32px; display: flex; flex-direction: column; gap: 12px; }
+.card h3 { font-size: 32px; }
+.card p { font-size: 26px; }
+.card .tag { font-size: 24px; font-weight: 600; color: var(--amber); letter-spacing: 2px; }
+.card.why { border-left: 6px solid var(--green); }
+.card.why .tag { color: var(--green); }
+.card.cpp { border-left: 6px solid var(--teal); }
+.card.cpp .tag { color: var(--teal); }
+.card.warn { border-left: 6px solid var(--red); }
+.card.warn .tag { color: var(--red); }
+
+.big { font-family: 'Rubik', Arial, sans-serif; font-size: 120px; font-weight: 700; line-height: 1; color: var(--amber); }
+.big.teal { color: var(--teal); }
+.big.green { color: var(--green); }
+.big.red { color: var(--red); }
+
+table { font-size: 26px; color: var(--body); width: 100%; }
+
+.flow { display: grid; grid-template-columns: 1fr 70px 1fr 70px 1fr; row-gap: 22px; align-items: center; }
+.box { background: var(--panel); border: 2px solid #34444F; border-radius: 14px; padding: 18px 22px; display: flex; flex-direction: column; gap: 4px; }
+.box h3 { font-size: 30px; }
+.box p { font-size: 24px; color: var(--muted); }
+.box.task { border-color: var(--amber); }
+.box.task h3 { color: var(--amber); }
+.arrow { font-size: 44px; color: var(--muted); text-align: center; }
+
+.qa { display: flex; flex-direction: column; gap: 10px; }
+.qa h3 { font-size: 30px; color: var(--amber); }
+.qa p { font-size: 26px; }
+
+.parthead { justify-content: center; gap: 28px; }
+.parthead .num { font-family: 'Rubik', Arial, sans-serif; font-size: 200px; font-weight: 700; color: var(--amber); line-height: 1; }
+.parthead ul { margin: 0; padding-left: 40px; font-size: 32px; color: var(--body); line-height: 1.5; }
+
+.qa .fragment { opacity: 0; transition: opacity 300ms ease; }
+.qa .fragment.visible { opacity: 1; color: var(--green); }
+
+ul.plain { margin: 0; padding-left: 36px; font-size: 28px; color: var(--body); line-height: 1.45; }
+ol.steps { margin: 0; padding-left: 44px; font-size: 30px; color: var(--body); line-height: 1.6; }
+
+
+* { margin: 0 }
+html, body { background: #0B1015; color: #E8EEF2; font-family: 'Inter', Arial, sans-serif; }
+.top { padding: 24px 32px; display: flex; flex-direction: column; gap: 6px; }
+.top h1 { font: 700 28px/1.2 'Rubik', Arial, sans-serif; }
+.top p { font-size: 15px; color: #94A4B1; }
+.pair { display: grid; grid-template-columns: 960px minmax(280px, 1fr); gap: 24px; padding: 16px 32px; align-items: start; }
+.frame { width: 960px; height: 540px; overflow: hidden; border-radius: 8px; box-shadow: 0 6px 24px rgba(0,0,0,.4); }
+.frame > section { width: 1920px !important; height: 1080px !important; transform: scale(.5); transform-origin: 0 0;
+  overflow: hidden !important; box-sizing: border-box !important; position: relative; }
+.notes { font-size: 16px; line-height: 1.6; color: #C3CED6; background: #151E26; border-radius: 8px; padding: 16px 20px; }
+.notes b { display: block; color: #FF8B4F; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 6px; }
+.part { padding: 28px 32px 4px; color: #FF8B4F; font: 600 13px/1 'Inter', Arial, sans-serif; letter-spacing: .14em; text-transform: uppercase; }
+aside { display: none !important; }
+.fragment { opacity: 1 !important; }
+table { width: 100%; border-collapse: separate; border-spacing: 0; }
+th, td { padding: .35em .6em; text-align: left; border-bottom: 2px solid #ffffff22; }
+@media (max-width: 1300px) { .pair { grid-template-columns: 1fr; } }
+</style></head><body><div class=top><h1>ICP Node Walkthrough</h1><p>37 slides with speaker notes. Offline copy of the Slides deck; open explorer.html for the hover explanations.</p></div><p class="part">Part 1: how the node is built: parameters, TF, subscriptions, time, predict, wheels and gyro.</p>
+<div class="pair" id="cover"><div class="frame"><section id="cover" class="statement">
+<p class="eyebrow">MOBILE ROBOTS · EXERCISE 5 · CODE WALKTHROUGH</p>
+<h1>The ICP node,<br>line by line</h1>
+<p class="lead">Five parts: how the node is built · frames, points and the guess · the ICP loop · ICP in the filter and results · live in RViz and loose ends</p>
+<p class="lead">Every line explained on hover: <a href="https://claude.ai/artifact/7kw7yMKe887ie4zzRppLsk">ICP Node Explorer</a></p>
+<aside>This deck follows the five walkthrough videos. We read the ICP node of Exercise 5 line by line, and for every line we ask why it’s written that way and what would go wrong otherwise. The code is the fixed version in ros2_ws/src/icp_odom/src/icp_node.cpp. Where it differs from the team’s original, I say what the original did and why it changed. Part 1 covers how the node is built. Part 2 covers TASK 1, turning a scan into points, and TASK 2. Part 3 is TASK 3, the ICP loop. Part 4 is how ICP enters the Kalman filter, plus the results on the bag and a quiz. Part 5 shows the node live in RViz and picks up a few loose ends.</aside>
+</section>
+</div><div class="notes"><b>Slide 1 · speaker notes</b>This deck follows the five walkthrough videos. We read the ICP node of Exercise 5 line by line, and for every line we ask why it’s written that way and what would go wrong otherwise. The code is the fixed version in ros2_ws/src/icp_odom/src/icp_node.cpp. Where it differs from the team’s original, I say what the original did and why it changed. Part 1 covers how the node is built. Part 2 covers TASK 1, turning a scan into points, and TASK 2. Part 3 is TASK 3, the ICP loop. Part 4 is how ICP enters the Kalman filter, plus the results on the bag and a quiz. Part 5 shows the node live in RViz and picks up a few loose ends.</div></div>
+<div class="pair" id="map"><div class="frame"><section id="map">
+<div class="head">
+<p class="eyebrow">PART 1 · HOW THE NODE IS BUILT</p>
+<h2>The whole node in one picture</h2>
+</div>
+<div class="flow">
+<div class="box"><h3>lidar scan</h3><p>a ring of distances, 20× a second</p></div>
+<p class="arrow">→</p>
+<div class="box"><h3>scanCallback</h3><p>runs for every scan</p></div>
+<p class="arrow">→</p>
+<div class="box task"><h3>TASK 1 getTransform</h3><p>sensor frame → robot frame</p></div>
+<div></div><div></div><div></div><div></div>
+<p class="arrow">↓</p>
+<div class="box"><h3>Kalman filter</h3><p>combines all sensors</p></div>
+<p class="arrow">←</p>
+<div class="box task"><h3>TASK 3 ICP loop</h3><p>how did the robot move?</p></div>
+<p class="arrow">←</p>
+<div class="box task"><h3>TASK 2 initial guess</h3><p>where ICP starts looking</p></div>
+<p class="arrow">↓</p>
+<p class="arrow">↖</p>
+<div></div><div></div><div></div>
+<div class="box"><h3>robot pose</h3><p>TF odom → base_footprint</p></div>
+<div></div>
+<div class="box"><h3>odom / IMU callbacks</h3><p>wheels and gyroscope</p></div>
+<div></div><div></div>
+</div>
+<aside>Here’s the whole node in one picture. Everything starts with a lidar scan: a ring of distance measurements, twenty times a second. For every scan, the node runs a function called scanCallback. TASK 1 converts the scan from the sensor’s frame into the robot’s frame. TASK 2 guesses how far the robot moved since the last scan. TASK 3, the ICP loop, shifts the old scan onto the new one and measures the real motion. That motion goes into a Kalman filter, which combines it with the other sensors. The filter’s result is the robot’s pose, which the node publishes on TF as odom to base_footprint. The wheels and the gyroscope feed the same filter through their own callbacks. That’s where Part 1 starts.</aside>
+</section>
+</div><div class="notes"><b>Slide 2 · speaker notes</b>Here’s the whole node in one picture. Everything starts with a lidar scan: a ring of distance measurements, twenty times a second. For every scan, the node runs a function called scanCallback. TASK 1 converts the scan from the sensor’s frame into the robot’s frame. TASK 2 guesses how far the robot moved since the last scan. TASK 3, the ICP loop, shifts the old scan onto the new one and measures the real motion. That motion goes into a Kalman filter, which combines it with the other sensors. The filter’s result is the robot’s pose, which the node publishes on TF as odom to base_footprint. The wheels and the gyroscope feed the same filter through their own callbacks. That’s where Part 1 starts.</div></div>
+<div class="pair" id="params"><div class="frame"><section id="params">
+<div class="head">
+<p class="eyebrow">01 · THE CONSTRUCTOR · LINES 57–62</p>
+<h2>Parameters: three modes, set from the launch file</h2>
+</div>
+<div class="row">
+<div class="col2">
+<p class="code"><span class="k">this</span>-&gt;declare_parameter(<span class="n">"icp_only"</span>, false);<br>icp_only_ = <span class="k">this</span>-&gt;get_parameter(<span class="n">"icp_only"</span>).as_bool();<br><span class="k">this</span>-&gt;declare_parameter(<span class="n">"use_icp"</span>, true);<br>use_icp_ = <span class="k">this</span>-&gt;get_parameter(<span class="n">"use_icp"</span>).as_bool();<br><span class="k">this</span>-&gt;declare_parameter(<span class="n">"icp_gain"</span>, 1.0);<br>icp_gain_ = <span class="k">this</span>-&gt;get_parameter(<span class="n">"icp_gain"</span>).as_double();</p>
+<div class="card cpp"><p class="tag">C++</p><p>this-&gt;f( … ) calls a function of this node. as_bool() reads the value as true or false.</p></div>
+</div>
+<div class="col">
+<table>
+<tr><th style="width:52%">use_icp / icp_only</th><th>mode</th></tr>
+<tr><td>false / false</td><td>wheels + gyro only (like Ex. 4)</td></tr>
+<tr><td>true / false</td><td>filter + ICP (default)</td></tr>
+<tr><td>any / true</td><td>ICP alone, no filter</td></tr>
+</table>
+<div class="card why"><p class="tag">WHY PARAMETERS</p><p>The launch file sets them, so you switch modes without recompiling. icp_gain sets how much the filter trusts ICP (Part 4).</p></div>
+</div>
+</div>
+<aside>The constructor runs once, when the node starts. First it declares a parameter called icp_only with the default false, then reads its value into a member variable. In C++, the arrow on this means: call a function of this node object. Why parameters at all? The launch file can set them, so you switch modes without recompiling. Two switches give three modes. icp_only means ICP alone, without the filter. use_icp means the filter with ICP added. With both off, the filter runs on wheels and gyroscope only, like in Exercise 4, which is useful to compare against. The third parameter, icp_gain, sets how much the filter trusts ICP. Part 4 shows what it does and which value to choose.</aside>
+</section>
+</div><div class="notes"><b>Slide 3 · speaker notes</b>The constructor runs once, when the node starts. First it declares a parameter called icp_only with the default false, then reads its value into a member variable. In C++, the arrow on this means: call a function of this node object. Why parameters at all? The launch file can set them, so you switch modes without recompiling. Two switches give three modes. icp_only means ICP alone, without the filter. use_icp means the filter with ICP added. With both off, the filter runs on wheels and gyroscope only, like in Exercise 4, which is useful to compare against. The third parameter, icp_gain, sets how much the filter trusts ICP. Part 4 shows what it does and which value to choose.</div></div>
+<div class="pair" id="tfsubs"><div class="frame"><section id="tfsubs" class="alt">
+<div class="head">
+<p class="eyebrow">01 · THE CONSTRUCTOR · LINES 82–96</p>
+<h2>TF objects and three independent subscriptions</h2>
+</div>
+<div class="row">
+<div class="col2">
+<p class="code">tf_broadcaster_ = std::make_shared&lt;TransformBroadcaster&gt;(this);<br>tf_buffer_ &#160; &#160; = std::make_unique&lt;Buffer&gt;(get_clock());<br>tf_listener_ &#160; = std::make_shared&lt;TransformListener&gt;(*tf_buffer_);<br><br>odom_sub_ = create_subscription&lt;Odometry&gt;(<span class="n">"/odom"</span>,<br>&#160; &#160; QoS(KeepLast(10)).reliable(), bind(&amp;odomCallback, …));<br><span class="c">// same for imu_topic and "/ouster/scan"</span></p>
+<div class="card cpp"><p class="tag">C++</p><p>make_shared&lt;X&gt; creates an X and a pointer that frees it when nobody needs it any more.</p></div>
+</div>
+<div class="col">
+<div class="card"><h3>broadcaster</h3><p>publishes our result, the pose odom → base_footprint</p></div>
+<div class="card"><h3>buffer + listener</h3><p>store every transform from /tf and /tf_static; TASK 1 asks this buffer</p></div>
+<div class="card why"><p class="tag">WHY NO SYNCHRONIZER</p><p>A slow sensor never holds back a fast one, and no message is thrown away. KeepLast(10) + reliable: a short delay costs no measurements.</p></div>
+</div>
+</div>
+<aside>Next come the TF objects. The broadcaster publishes our result, the robot’s pose; other programs like RViz read it from TF. In C++, make_shared creates the object and a pointer to it that cleans up after itself. The buffer and the listener belong together: the buffer stores every transform it has heard about, and the listener subscribes to /tf and /tf_static and fills it. We need them because TASK 1 asks this buffer how each sensor is mounted. Then the subscriptions. create_subscription tells ROS: call me when a message arrives on the odom topic, and the function it calls is odomCallback. std::bind packs that member function together with this object so ROS can call it. Keep last ten means up to ten messages wait if the callback is busy; reliable means none get lost. The same follows for the IMU and the lidar scan. Why not wait for all three together, like the synchronizer in Exercise 4? Because then a slow sensor holds back a fast one, and messages that don’t fit get thrown away. Possible question: why a class instead of globals? The node’s memory stays together and private, callbacks become member functions that can reach it, and it’s the usual ROS 2 style.</aside>
+</section>
+</div><div class="notes"><b>Slide 4 · speaker notes</b>Next come the TF objects. The broadcaster publishes our result, the robot’s pose; other programs like RViz read it from TF. In C++, make_shared creates the object and a pointer to it that cleans up after itself. The buffer and the listener belong together: the buffer stores every transform it has heard about, and the listener subscribes to /tf and /tf_static and fills it. We need them because TASK 1 asks this buffer how each sensor is mounted. Then the subscriptions. create_subscription tells ROS: call me when a message arrives on the odom topic, and the function it calls is odomCallback. std::bind packs that member function together with this object so ROS can call it. Keep last ten means up to ten messages wait if the callback is busy; reliable means none get lost. The same follows for the IMU and the lidar scan. Why not wait for all three together, like the synchronizer in Exercise 4? Because then a slow sensor holds back a fast one, and messages that don’t fit get thrown away. Possible question: why a class instead of globals? The node’s memory stays together and private, callbacks become member functions that can reach it, and it’s the usual ROS 2 style.</div></div>
+<div class="pair" id="time"><div class="frame"><section id="time">
+<div class="head">
+<p class="eyebrow">02 · FIX 1 · LINES 195–202, 123–129</p>
+<h2>Time, and the reset when the bag loops</h2>
+</div>
+<div class="row">
+<div class="col2">
+<p class="code"><span class="k">double</span> dt = (t - filter_time_).seconds();<br><span class="k">if</span> (dt &lt; -kTimeJumpBack) <span class="c">// more than 1 s back</span><br>{<br>&#160; resetFilter(t); <span class="c">// origin, new time, forget last scan</span><br>&#160; <span class="k">return</span>;<br>}<br><span class="k">if</span> (dt &lt;= 0) <span class="c">// a few ms older: normal</span><br>&#160; <span class="k">return</span>;</p>
+<div class="card why"><p class="tag">WHY 1 SECOND, NOT 0</p><p>Odom (50 Hz) and IMU (125 Hz) interleave, so a few ms backwards happens all the time. 1 s is far above that jitter and far below the 40 s bag.</p></div>
+</div>
+<div class="col">
+<div class="card warn"><p class="tag">THE ORIGINAL</p><p>Returned on dt ≤ 0 without updating its stored time. After the loop every message looked too old: the robot froze at 44.5 s.</p></div>
+<div class="card"><h3>resetFilter does three things</h3><p>initialState(): back to the origin with the starting uncertainty · filter_time_ = t · have_last_scan_ = false, because a scan from the bag’s end against one from its start would look like a huge jump</p></div></div>
+</div>
+<aside>Every message carries a time stamp, the moment it was measured. The filter remembers the time of its last update and moves its state forward by the difference, dt. When you play the bag in a loop, time suddenly jumps back by forty seconds, and the original code didn’t handle that. The last check comes first: if dt is zero or negative, the message is a little older than the last one. That’s normal, because odometry at fifty hertz and IMU at a hundred and twenty five hertz arrive interleaved, so the message is simply skipped. A big jump back is different. If time goes back by more than kTimeJumpBack, one second, the bag has started over, and resetFilter starts again at the origin. The original returned here without updating its stored time; after the loop every message looked too old and the robot froze. resetFilter puts the state back to the origin with the starting uncertainty, takes the new time, and forgets the last scan. Question: why one second and not zero? A threshold of zero would reset constantly, because of the interleaving jitter.</aside>
+</section>
+</div><div class="notes"><b>Slide 5 · speaker notes</b>Every message carries a time stamp, the moment it was measured. The filter remembers the time of its last update and moves its state forward by the difference, dt. When you play the bag in a loop, time suddenly jumps back by forty seconds, and the original code didn’t handle that. The last check comes first: if dt is zero or negative, the message is a little older than the last one. That’s normal, because odometry at fifty hertz and IMU at a hundred and twenty five hertz arrive interleaved, so the message is simply skipped. A big jump back is different. If time goes back by more than kTimeJumpBack, one second, the bag has started over, and resetFilter starts again at the origin. The original returned here without updating its stored time; after the loop every message looked too old and the robot froze. resetFilter puts the state back to the origin with the starting uncertainty, takes the new time, and forgets the last scan. Question: why one second and not zero? A threshold of zero would reset constantly, because of the interleaving jitter.</div></div>
+<div class="pair" id="predict"><div class="frame"><section id="predict" class="alt">
+<div class="head">
+<p class="eyebrow">03 · PREDICT · LINES 157–166</p>
+<h2>predict: where is the robot after dt?</h2>
+</div>
+<div class="row">
+<div class="col2">
+<p class="code">A(0, 3) = c * dt; &#160; &#160; &#160; &#160; &#160;<span class="c">// x += cos θ · v · dt</span><br>A(0, 5) = c * 0.5 * dt * dt; <span class="c">// + ½ a dt²</span><br>A(1, 3) = ss * dt; &#160; &#160; &#160; &#160; <span class="c">// y += sin θ · v · dt</span><br>A(2, 4) = dt; &#160; &#160; &#160; &#160; &#160; &#160; &#160;<span class="c">// θ += ω · dt</span><br>A(3, 5) = dt; &#160; &#160; &#160; &#160; &#160; &#160; &#160;<span class="c">// v += a · dt</span><br><br>Eu.diagonal() &lt;&lt; 0.001, 0.001, 0.001, 0.05, 0.05, 0.5;<br>Eu *= dt; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; <span class="c">// noise grows with time</span></p>
+</div>
+<div class="col">
+<div class="card"><h3>the state: six numbers</h3><p>x, y, heading θ, speed v, turn rate ω, acceleration a. C++ counts from 0, so x(3) is v.</p></div>
+<div class="card why"><p class="tag">WHY COS AND SIN</p><p>The speed points along the heading; cos θ and sin θ split it into an x part and a y part. A starts as the identity: what isn’t set stays the same.</p></div>
+<div class="card why"><p class="tag">WHY Eu × dt</p><p>The longer we predict without a measurement, the less sure we can be.</p></div>
+</div>
+</div>
+<aside>Predict belongs to the Kalman filter. Every callback calls it first, to move the state forward to the time of its message; only then does it correct the state with the measurement. The state is six numbers: position x and y, the heading, the speed, the turn rate and the acceleration. Predict asks: if the robot keeps moving like this, where is it after dt seconds, and how much less sure are we? These lines fill the matrix A. Position x grows by the cosine of the heading, times speed, times dt; y grows by the sine. The acceleration adds one half a dt squared, the school physics formula. The heading grows by turn rate times dt and the speed by acceleration times dt. Everything else stays the same, because A starts as the identity. Eu is the process noise: how wrong the model may be per second. It’s multiplied by dt, because the longer we predict without a measurement, the less sure we can be. Question: why is predict called in every callback? Every measurement belongs to its own moment, so the state is moved to that moment first; that’s why all sensors share one filter_time_.</aside>
+</section>
+</div><div class="notes"><b>Slide 6 · speaker notes</b>Predict belongs to the Kalman filter. Every callback calls it first, to move the state forward to the time of its message; only then does it correct the state with the measurement. The state is six numbers: position x and y, the heading, the speed, the turn rate and the acceleration. Predict asks: if the robot keeps moving like this, where is it after dt seconds, and how much less sure are we? These lines fill the matrix A. Position x grows by the cosine of the heading, times speed, times dt; y grows by the sine. The acceleration adds one half a dt squared, the school physics formula. The heading grows by turn rate times dt and the speed by acceleration times dt. Everything else stays the same, because A starts as the identity. Eu is the process noise: how wrong the model may be per second. It’s multiplied by dt, because the longer we predict without a measurement, the less sure we can be. Question: why is predict called in every callback? Every measurement belongs to its own moment, so the state is moved to that moment first; that’s why all sensors share one filter_time_.</div></div>
+<div class="pair" id="odomimu"><div class="frame"><section id="odomimu">
+<div class="head">
+<p class="eyebrow">04 · WHEELS AND GYROSCOPE · FIX 3</p>
+<h2>Odometry and IMU feed the filter</h2>
+</div>
+<div class="row">
+<div class="col">
+<div class="card"><h3>wheels: z = [v, ω], variance 0.1</h3><p>A differential drive measures forward speed (linear.x) and turn rate (angular.z). H(0,3) and H(1,4) pick state entries v and ω.</p></div>
+<div class="card cpp"><p class="tag">.linear() VS .matrix()</p><p>Speeds are directions: only the rotation applies. Points are positions: rotation and shift.</p></div>
+<div class="card"><h3>gyro: z = [ω], variance 0.05</h3><p>Trusted more than the wheels for turning: a gyroscope measures it directly, wheels slip in turns.</p></div>
+</div>
+<div class="col">
+<div class="card warn"><p class="tag">FIX 3: THE IMU TOPIC</p><p>/ouster/imu reads 0.006 rad/s while standing still: 14° over the 40 s bag. Now /imu/data_raw, the Phidget IMU.</p></div>
+<div class="card why"><p class="tag">WHY NO ACCELERATION</p><p>imu_use_acc_ ? 2 : 1, off by default. The Phidget’s TF gives it the wrong sign, the Ouster reads 0.5 m/s² standing, and the wheels measure v well anyway.</p></div>
+</div>
+</div>
+<aside>Now the wheels and the gyroscope. Their callbacks run between the scans, many times a second. The odometry message says in which frame its speeds are given, the child_frame_id. Linear x is the forward speed and angular z is the turn rate; a robot with two driven wheels measures exactly these two. If that frame isn’t base_footprint, TASK 1 looks up how it’s turned and both vectors are rotated with .linear(), the rotation part only, because speeds are directions: where a sensor is mounted doesn’t change a direction, only how it’s turned. In our bag the child frame already is base_footprint, so nothing changes. The measurement noise Ez is 0.1 for both wheel values; smaller means more trusted. The IMU: the robot has two. The default is now the Phidget IMU on /imu/data_raw. The original used the Ouster’s IMU, whose gyroscope reads 0.006 radians per second while standing still, fourteen degrees over the bag. The acceleration is off by default: the Phidget’s TF gives it the wrong sign, and the Ouster reads half a metre per second squared while standing. So z holds just the gyro turn rate, with variance 0.05.</aside>
+</section>
+</div><div class="notes"><b>Slide 7 · speaker notes</b>Now the wheels and the gyroscope. Their callbacks run between the scans, many times a second. The odometry message says in which frame its speeds are given, the child_frame_id. Linear x is the forward speed and angular z is the turn rate; a robot with two driven wheels measures exactly these two. If that frame isn’t base_footprint, TASK 1 looks up how it’s turned and both vectors are rotated with .linear(), the rotation part only, because speeds are directions: where a sensor is mounted doesn’t change a direction, only how it’s turned. In our bag the child frame already is base_footprint, so nothing changes. The measurement noise Ez is 0.1 for both wheel values; smaller means more trusted. The IMU: the robot has two. The default is now the Phidget IMU on /imu/data_raw. The original used the Ouster’s IMU, whose gyroscope reads 0.006 radians per second while standing still, fourteen degrees over the bag. The acceleration is off by default: the Phidget’s TF gives it the wrong sign, and the Ouster reads half a metre per second squared while standing. So z holds just the gyro turn rate, with variance 0.05.</div></div>
+<p class="part">Part 2: TASK 1 getTransform, scan to points, TASK 2 the initial guess.</p>
+<div class="pair" id="p2"><div class="frame"><section id="p2" class="alt parthead">
+<p class="eyebrow">PART 2</p>
+<p class="num">02</p>
+<h2>Frames, points and the guess</h2>
+<ul>
+<li>TASK 1: getTransform, sensor frame → robot frame</li>
+<li>scan to points: angle and distance → x and y</li>
+<li>TASK 2: the initial guess, where ICP starts</li>
+</ul>
+<aside>Part 2 follows one lidar scan into the node. First TASK 1, which converts between frames. Then how a scan becomes points, and finally TASK 2, the guess where ICP starts looking.</aside>
+</section>
+</div><div class="notes"><b>Slide 8 · speaker notes</b>Part 2 follows one lidar scan into the node. First TASK 1, which converts between frames. Then how a scan becomes points, and finally TASK 2, the guess where ICP starts looking.</div></div>
+<div class="pair" id="task1why"><div class="frame"><section id="task1why">
+<div class="head">
+<p class="eyebrow">TASK 1 · WHAT getTransform IS FOR</p>
+<h2>Every sensor measures relative to itself</h2>
+</div>
+<div class="row">
+<div class="col">
+<p class="lead">On this robot the lidar, os_lidar, sits 0.54 m up and is turned by 180°. In its own numbers, a wall in front of the robot shows up behind it.</p>
+<p class="lead">getTransform converts the lidar’s points into the robot’s frame, base_footprint, so everything the node compares is measured from the same place.</p>
+<p class="small">called in scanCallback (line 352), odomCallback (line 211), imuCallback (line 276)</p>
+</div>
+<div class="col">
+<div class="card"><p class="tag">REAL SCAN PAIR, STRAIGHT DRIVE</p><p class="big green">+0.68 m</p><p>with TF: forward, like the wheels (+0.63 m)</p></div>
+<div class="card warn"><p class="tag">WITHOUT TF</p><p class="big red">−0.68 m</p><p>the robot seems to drive backwards</p></div>
+</div>
+</div>
+<aside>Before reading any code, here is where TASK 1 sits. Every time the lidar sends a scan, the node runs scanCallback, and the first thing it does is call TASK 1, getTransform. The odometry and IMU callbacks call it too, for their own messages. Every sensor measures relative to itself. On this robot, the lidar sits fifty four centimetres up and is turned around by a hundred and eighty degrees, so in the lidar’s own numbers a wall in front of the robot shows up behind it. getTransform tells us how to convert the lidar’s points into the robot’s own frame, base_footprint; then everything the node compares is measured from the same place. Without it, ICP would compare points in the wrong frame. On our real scan pair, ICP then says minus 0.68 metres instead of plus 0.68: the robot would seem to drive backwards. That’s the “inverted” warning on the exercise sheet.</aside>
+</section>
+</div><div class="notes"><b>Slide 9 · speaker notes</b>Before reading any code, here is where TASK 1 sits. Every time the lidar sends a scan, the node runs scanCallback, and the first thing it does is call TASK 1, getTransform. The odometry and IMU callbacks call it too, for their own messages. Every sensor measures relative to itself. On this robot, the lidar sits fifty four centimetres up and is turned around by a hundred and eighty degrees, so in the lidar’s own numbers a wall in front of the robot shows up behind it. getTransform tells us how to convert the lidar’s points into the robot’s own frame, base_footprint; then everything the node compares is measured from the same place. Without it, ICP would compare points in the wrong frame. On our real scan pair, ICP then says minus 0.68 metres instead of plus 0.68: the robot would seem to drive backwards. That’s the “inverted” warning on the exercise sheet.</div></div>
+<div class="pair" id="task1code"><div class="frame"><section id="task1code" class="alt">
+<div class="head">
+<p class="eyebrow">TASK 1 · LINES 308–329</p>
+<h2>getTransform, line by line</h2>
+</div>
+<div class="row">
+<div class="col2">
+<p class="code"><span class="k">bool</span> getTransform(<span class="k">const</span> std::string &amp;source_frame,<br>&#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; <span class="k">const</span> rclcpp::Time &amp;time, Eigen::Isometry3d &amp;T_out)<br>{<br>&#160; <span class="k">try</span> {<br>&#160; &#160; <span class="k">auto</span> tf_msg = tf_buffer_-&gt;lookupTransform(<br>&#160; &#160; &#160; &#160; base_frame_, source_frame, time,<br>&#160; &#160; &#160; &#160; rclcpp::Duration::from_seconds(0.1));<br>&#160; &#160; T_out = tf2::transformToEigen(tf_msg);<br>&#160; &#160; <span class="k">return</span> true;<br>&#160; } <span class="k">catch</span> (<span class="k">const</span> tf2::TransformException &amp;ex) {<br>&#160; &#160; RCLCPP_WARN_THROTTLE(…, 2000, …);<br>&#160; &#160; <span class="k">return</span> false;<br>&#160; }<br>}</p>
+</div>
+<div class="col">
+<div class="card cpp"><p class="tag">C++</p><p>&amp; works on the caller’s own variable, no copy, so T_out can be filled in. try/catch: if the lookup fails, jump to catch instead of crashing. a-&gt;f() calls f on the object a points to.</p></div>
+<div class="card"><h3>the arguments</h3><p>1 target base_frame_ · 2 source: the sensor · 3 the message’s own time stamp · 4 wait at most 0.1 s</p></div>
+<div class="card"><h3>the result</h3><p>an Eigen isometry, rotation + shift: p_robot = T · p_sensor</p></div>
+</div>
+</div>
+<aside>First, the signature. The function gets three things: the name of the sensor’s frame, the time the data was measured, and an empty transform called T_out, which it fills in. It returns true if that worked and false if not. In C++, bool means true or false, and the ampersand means the function works on the caller’s own variable instead of a copy, which is how it can fill in T_out. Next comes the try block: if something inside try fails, the program jumps to the matching catch block instead of crashing. Here the lookup fails when TF has no answer yet, right after startup, before the static transforms have arrived. Inside the try block we ask the TF buffer for the transform. lookupTransform does the asking and the answer is stored in tf_msg. The first two arguments are the frames: the target comes first, base_footprint, the robot; the source second, the sensor. In this order, the result moves sensor points into the robot frame. The third argument is the message’s own time stamp, and the last says how long to wait: at most a tenth of a second. Then transformToEigen turns the message into an Eigen isometry, a rotation plus a shift, and the function returns true. If anything went wrong, we land in the catch block, print a throttled warning, and return false.</aside>
+</section>
+</div><div class="notes"><b>Slide 10 · speaker notes</b>First, the signature. The function gets three things: the name of the sensor’s frame, the time the data was measured, and an empty transform called T_out, which it fills in. It returns true if that worked and false if not. In C++, bool means true or false, and the ampersand means the function works on the caller’s own variable instead of a copy, which is how it can fill in T_out. Next comes the try block: if something inside try fails, the program jumps to the matching catch block instead of crashing. Here the lookup fails when TF has no answer yet, right after startup, before the static transforms have arrived. Inside the try block we ask the TF buffer for the transform. lookupTransform does the asking and the answer is stored in tf_msg. The first two arguments are the frames: the target comes first, base_footprint, the robot; the source second, the sensor. In this order, the result moves sensor points into the robot frame. The third argument is the message’s own time stamp, and the last says how long to wait: at most a tenth of a second. Then transformToEigen turns the message into an Eigen isometry, a rotation plus a shift, and the function returns true. If anything went wrong, we land in the catch block, print a throttled warning, and return false.</div></div>
+<div class="pair" id="task1choices"><div class="frame"><section id="task1choices">
+<div class="head">
+<p class="eyebrow">TASK 1 · THE CHOICES</p>
+<h2>Why getTransform is written this way</h2>
+</div>
+<table style="font-size:25px">
+<tr><th style="width:24%">choice</th><th style="width:44%">why</th><th>instead</th></tr>
+<tr><td>return true / false</td><td>each caller reacts differently: the scan is skipped, odom and IMU keep raw values</td><td>throwing: every callback needs its own try/catch</td></tr>
+<tr><td>try / catch</td><td>right after startup /tf_static may not be in the buffer yet</td><td>no catch: the node crashes on its first message</td></tr>
+<tr><td>target, then source</td><td>gives p_robot = T · p_sensor</td><td>swapped: the inverse, points in the wrong place</td></tr>
+<tr><td>the message’s stamp</td><td>right for moving joints and bag playback</td><td>now(): wrong time when playing a bag</td></tr>
+<tr><td>timeout 0.1 s</td><td>one thread: while it waits, no other callback runs</td><td>long timeout: odom and IMU pile up</td></tr>
+<tr><td>WARN_THROTTLE 2000</td><td>runs up to 125 times a second</td><td>plain WARN floods the terminal</td></tr>
+</table>
+<aside>Here are the choices behind getTransform in one table. True or false instead of an exception, because the callers react differently to a failure: the scan callback drops the scan, odometry and IMU keep their raw values, and with true or false each caller handles that with a simple if. The try/catch is there because right after startup the static transforms may not have arrived yet. We use the TF buffer because the lidar isn’t mounted directly on the robot’s base frame; it sits six frames away, and the buffer multiplies that whole chain for us. Target first, then source: in this order, the result moves sensor points into the robot frame; swapped, you get the opposite transform. The message’s own stamp is right for moving joints and for a bag played back later. The timeout is short because the node runs in one thread: while it waits, no other callback can run, and a new scan arrives every fifty milliseconds. The warning is throttled to once every two seconds because this function runs for every message, up to a hundred and twenty five times a second. Testat question: which way does lookupTransform(base_frame_, source_frame) convert? From the sensor frame into the base frame: p_base = T · p_sensor.</aside>
+</section>
+</div><div class="notes"><b>Slide 11 · speaker notes</b>Here are the choices behind getTransform in one table. True or false instead of an exception, because the callers react differently to a failure: the scan callback drops the scan, odometry and IMU keep their raw values, and with true or false each caller handles that with a simple if. The try/catch is there because right after startup the static transforms may not have arrived yet. We use the TF buffer because the lidar isn’t mounted directly on the robot’s base frame; it sits six frames away, and the buffer multiplies that whole chain for us. Target first, then source: in this order, the result moves sensor points into the robot frame; swapped, you get the opposite transform. The message’s own stamp is right for moving joints and for a bag played back later. The timeout is short because the node runs in one thread: while it waits, no other callback can run, and a new scan arrives every fifty milliseconds. The warning is throttled to once every two seconds because this function runs for every message, up to a hundred and twenty five times a second. Testat question: which way does lookupTransform(base_frame_, source_frame) convert? From the sensor frame into the base frame: p_base = T · p_sensor.</div></div>
+<div class="pair" id="scanpoints"><div class="frame"><section id="scanpoints" class="alt">
+<div class="head">
+<p class="eyebrow">SCAN CALLBACK · LINES 337–368</p>
+<h2>From a scan to points in the robot frame</h2>
+</div>
+<div class="row">
+<div class="col2">
+<p class="code"><span class="k">double</span> angle = scan-&gt;angle_min;<br><span class="k">for</span> (size_t i = 0; i &lt; scan-&gt;ranges.size(); ++i) {<br>&#160; <span class="k">float</span> r = scan-&gt;ranges[i];<br>&#160; <span class="k">if</span> (std::isfinite(r) &amp;&amp; r &gt;= scan-&gt;range_min &amp;&amp; …)<br>&#160; &#160; cloud-&gt;emplace_back(r * cos(angle), r * sin(angle), 0);<br>&#160; angle += scan-&gt;angle_increment; <span class="c">// 0.5°</span><br>}<br><span class="k">if</span> (getTransform(frame_id, stamp, T_base_lidar))<br>&#160; pcl::transformPointCloud(…, T_base_lidar.matrix());<br><span class="k">else return</span>; <span class="c">// skip this scan</span><br><span class="k">if</span> (!have_last_scan_) { <span class="c">/* store it, return */</span> }</p>
+</div>
+<div class="col">
+<div class="card"><p class="tag">ABOUT 722 RAYS → ABOUT 250 POINTS</p><p>Only finite rays inside the range limits become points. inf: hit nothing (use_inf). range_min 0.45 m: the robot itself.</p></div>
+<div class="card why"><p class="tag">WHY .matrix() HERE</p><p>Points are positions: they need rotation and shift. Speeds only needed .linear().</p></div>
+<div class="card why"><p class="tag">WHY SKIP THE SCAN</p><p>Points in the wrong frame give a wrong motion the filter would trust. The first scan is only stored: ICP needs two.</p></div>
+</div>
+</div>
+<aside>A lidar scan is a list of distances. The lidar turns around and measures one distance every half degree, about seven hundred and twenty per turn, and where a ray hits something, we get a point. The first ray points in the direction angle_min. The loop goes over every ray; in C++ a for loop has three parts: start at zero, continue while i is smaller than the size, add one after each round. A ray only becomes a point if it’s usable: it must be finite, because rays that hit nothing come as infinity since the launch file sets use_inf, and it must be inside the range limits; the minimum of forty five centimetres cuts off the robot itself. Then the polar to x-y conversion: x is r times the cosine of the angle, y is r times the sine. About two hundred and fifty points remain on the bag. Next, TASK 1 gives the lidar’s mounting, and transformPointCloud moves every point into the robot frame with the full matrix, because points are positions and need both the rotation and the shift. If the transform failed, the scan is skipped: points in the wrong frame are worse than none. The very first scan has nothing to compare with, so it’s only stored as the last scan, with its time.</aside>
+</section>
+</div><div class="notes"><b>Slide 12 · speaker notes</b>A lidar scan is a list of distances. The lidar turns around and measures one distance every half degree, about seven hundred and twenty per turn, and where a ray hits something, we get a point. The first ray points in the direction angle_min. The loop goes over every ray; in C++ a for loop has three parts: start at zero, continue while i is smaller than the size, add one after each round. A ray only becomes a point if it’s usable: it must be finite, because rays that hit nothing come as infinity since the launch file sets use_inf, and it must be inside the range limits; the minimum of forty five centimetres cuts off the robot itself. Then the polar to x-y conversion: x is r times the cosine of the angle, y is r times the sine. About two hundred and fifty points remain on the bag. Next, TASK 1 gives the lidar’s mounting, and transformPointCloud moves every point into the robot frame with the full matrix, because points are positions and need both the rotation and the shift. If the transform failed, the scan is skipped: points in the wrong frame are worse than none. The very first scan has nothing to compare with, so it’s only stored as the last scan, with its time.</div></div>
+<div class="pair" id="task2"><div class="frame"><section id="task2">
+<div class="head">
+<p class="eyebrow">TASK 2 · LINES 384–392</p>
+<h2>The initial guess: where ICP starts looking</h2>
+</div>
+<div class="row">
+<div class="col2">
+<p class="code"><span class="k">double</span> vx = state_.x(3); <span class="c">// speed v</span><br><span class="k">double</span> w &#160;= state_.x(4); <span class="c">// turn rate ω</span><br><br>guess_robot_base(0) = vx * dt_scan; <span class="c">// forward [m]</span><br>guess_robot_base(1) = 0.0; &#160; &#160; &#160; &#160; <span class="c">// sideways [m]</span><br>guess_robot_base(2) = w * dt_scan; &#160;<span class="c">// turn [rad]</span></p>
+<div class="card cpp"><p class="tag">C++</p><p>state_.x(3) is entry 3, counting from 0: x, y, θ, v, ω, a.</p></div>
+</div>
+<div class="col">
+<div class="card why"><p class="tag">WHY FROM THE FILTER</p><p>It combines wheels, gyro and ICP: the best estimate of the current motion. Raw wheels would carry slip in turns.</p></div>
+<div class="card why"><p class="tag">WHY SIDEWAYS 0</p><p>Wheels can’t slide sideways; on a curve the offset is ≈ v·dt·sin(ω·dt/2), under 1 mm at 20 scans per second.</p></div>
+<div class="card why"><p class="tag">WHY NO ACCELERATION</p><p>Over 50 ms, ½·a·dt² adds less than a millimetre.</p></div>
+</div>
+</div>
+<aside>TASK 2 comes right after TASK 1, still inside scanCallback. The new scan is now in the robot frame. Next, ICP in TASK 3 will shift the old scan until it lines up with the new one, and TASK 2 decides where that search starts. Why does the start matter? ICP only finds the nearest fit; if it starts far away from the real motion, it can lock onto the wrong fit. The guess starts from the Kalman filter’s state. Entry three is the speed and entry four is the turn rate; C++ counts from zero, so entry zero is x. We take them from the filter rather than from the raw wheels, because the filter combines wheels, gyroscope and ICP, so it’s our best estimate of how the robot is moving. The forward part is speed times the time since the last scan; with a scan every fifty milliseconds that’s about six and a half centimetres. We ignore the acceleration, because over fifty milliseconds it adds less than a millimetre. The sideways part is zero, because wheels can’t slide sideways. The turn is the turn rate times the time since the last scan. Testat question: why does pure-ICP mode start at zero? With icp_only the filter doesn’t run, so x(3) and x(4) stay zero, and ICP has to find the whole motion itself.</aside>
+</section>
+</div><div class="notes"><b>Slide 13 · speaker notes</b>TASK 2 comes right after TASK 1, still inside scanCallback. The new scan is now in the robot frame. Next, ICP in TASK 3 will shift the old scan until it lines up with the new one, and TASK 2 decides where that search starts. Why does the start matter? ICP only finds the nearest fit; if it starts far away from the real motion, it can lock onto the wrong fit. The guess starts from the Kalman filter’s state. Entry three is the speed and entry four is the turn rate; C++ counts from zero, so entry zero is x. We take them from the filter rather than from the raw wheels, because the filter combines wheels, gyroscope and ICP, so it’s our best estimate of how the robot is moving. The forward part is speed times the time since the last scan; with a scan every fifty milliseconds that’s about six and a half centimetres. We ignore the acceleration, because over fifty milliseconds it adds less than a millimetre. The sideways part is zero, because wheels can’t slide sideways. The turn is the turn rate times the time since the last scan. Testat question: why does pure-ICP mode start at zero? With icp_only the filter doesn’t run, so x(3) and x(4) stay zero, and ICP has to find the whole motion itself.</div></div>
+<div class="pair" id="task2turn"><div class="frame"><section id="task2turn" class="alt">
+<div class="head">
+<p class="eyebrow">TASK 2 · REAL SCANS WHILE TURNING</p>
+<h2>Why the guess matters</h2>
+</div>
+<p class="lead">The robot turns on the spot, almost 50° within half a second. Same scan pair, two starting points:</p>
+<div class="row">
+<div class="card warn"><p class="tag">ICP STARTED AT ZERO</p><p class="big red">9 pairs</p><p>Most points are over a metre from any partner. The result is nonsense.</p></div>
+<div class="card why"><p class="tag">ICP STARTED AT THE GUESS</p><p class="big green">197 pairs</p><p>Turn −0.837 rad; the wheels say −0.838 rad.</p></div>
+</div>
+<aside>Here’s why the guess matters, on real scans. The robot turns on the spot, almost fifty degrees within half a second. Started at zero, most points are more than a metre from any partner. Only nine pairs survive the one-metre limit, and ICP returns nonsense. Started at the filter’s guess, it lines up within a few iterations, with a hundred and ninety seven pairs, and the turn matches the wheels: minus 0.837 radians against minus 0.838. ICP only finds the nearest alignment, so where it starts matters. Always starting at zero fails on fast turns and large gaps.</aside>
+</section>
+</div><div class="notes"><b>Slide 14 · speaker notes</b>Here’s why the guess matters, on real scans. The robot turns on the spot, almost fifty degrees within half a second. Started at zero, most points are more than a metre from any partner. Only nine pairs survive the one-metre limit, and ICP returns nonsense. Started at the filter’s guess, it lines up within a few iterations, with a hundred and ninety seven pairs, and the turn matches the wheels: minus 0.837 radians against minus 0.838. ICP only finds the nearest alignment, so where it starts matters. Always starting at zero fails on fast turns and large gaps.</div></div>
+<p class="part">Part 3: TASK 3, the ICP loop step by step, statistics and result.</p>
+<div class="pair" id="p3"><div class="frame"><section id="p3" class="parthead">
+<p class="eyebrow">PART 3</p>
+<p class="num">03</p>
+<h2>TASK 3: the ICP loop</h2>
+<ul>
+<li>the idea, on real scans</li>
+<li>set-up: the inverse trick</li>
+<li>one round, step by step</li>
+<li>statistics and result</li>
+</ul>
+<aside>Part 3 is the heart of the exercise. TASK 3 is the function icp, lines 475 to 629. scanCallback calls it at line 396 with the old scan, the new scan, and the guess from TASK 2. First the idea on real scans, then the set-up, one round of the loop step by step, and what the function returns.</aside>
+</section>
+</div><div class="notes"><b>Slide 15 · speaker notes</b>Part 3 is the heart of the exercise. TASK 3 is the function icp, lines 475 to 629. scanCallback calls it at line 396 with the old scan, the new scan, and the guess from TASK 2. First the idea on real scans, then the set-up, one round of the loop step by step, and what the function returns.</div></div>
+<div class="pair" id="icpidea"><div class="frame"><section id="icpidea">
+<div class="head">
+<p class="eyebrow">TASK 3 · THE IDEA</p>
+<h2>Pair, align, move, and again</h2>
+</div>
+<div class="row">
+<div class="col2">
+<ol class="steps">
+<li>Pair every old point with its nearest new point.</li>
+<li>Compute the one rotation and shift that brings the pairs closest together.</li>
+<li>Move the old scan by it.</li>
+<li>Repeat until the step is tiny.</li>
+<li>The total of all steps is the robot’s motion.</li>
+</ol>
+</div>
+<div class="col">
+<div class="card"><p class="tag">TWO REAL SCANS, 0.5 S APART</p><p class="big teal">+0.68 m</p><p>forward, from ICP</p></div>
+<div class="card"><p class="tag">THE WHEELS SAY</p><p class="big">+0.63 m</p><p>about 250 pairs</p></div>
+</div>
+</div>
+<aside>Here’s the idea on two real scans, half a second apart. The robot drove forward, so the same walls show up in slightly different places. ICP pairs every old point with the nearest new point. Then it computes the one rotation and shift that brings the pairs closest together, and moves the old scan by it. Then it pairs again and moves again, until the step is tiny. The total of all steps is the robot’s motion: 0.68 metres forward. The wheels say 0.63.</aside>
+</section>
+</div><div class="notes"><b>Slide 16 · speaker notes</b>Here’s the idea on two real scans, half a second apart. The robot drove forward, so the same walls show up in slightly different places. ICP pairs every old point with the nearest new point. Then it computes the one rotation and shift that brings the pairs closest together, and moves the old scan by it. Then it pairs again and moves again, until the step is tiny. The total of all steps is the robot’s motion: 0.68 metres forward. The wheels say 0.63.</div></div>
+<div class="pair" id="inverse"><div class="frame"><section id="inverse" class="alt">
+<div class="head">
+<p class="eyebrow">TASK 3 · SET-UP · LINES 486–517</p>
+<h2>The inverse trick: ICP moves points, not the robot</h2>
+</div>
+<div class="row">
+<div class="col2">
+<p class="code">Eigen::Matrix3d T_guess_robot = Identity(); <span class="c">// "no motion"</span><br>T_guess_robot(0,0) = c_g; &#160;T_guess_robot(0,1) = -s_g;<br>T_guess_robot(0,2) = initial_guess_robot(0); <span class="c">// forward</span><br><span class="c">// … (1,0) = s_g, (1,1) = c_g, (1,2) = sideways</span><br>T_guess_point = T_guess_robot.inverse();<br><br><span class="c">// move every old point by the inverted guess</span><br>q.x = c0 * p.x - s0 * p.y + tx_gp;<br><br>T_total = T_guess_point; <span class="c">// all steps so far</span><br>kdtree.setInputCloud(tgt_cloud); <span class="c">// the new scan</span></p>
+</div>
+<div class="col">
+<div class="card"><h3>drive 1 m towards a wall…</h3><p>…and the wall comes 1 m closer. Points move the opposite way, so the guess is inverted.</p></div>
+<div class="card why"><p class="tag">WHY 3×3</p><p>Rotation and shift in one matrix; two motions combine by multiplying.</p></div>
+<div class="card why"><p class="tag">WHY THE TREE ON THE NEW SCAN</p><p>We search the new scan, and it never moves: one tree serves all 20 rounds.</p></div>
+</div>
+</div>
+<aside>The guess from TASK 2 says how the robot moved. But ICP moves the old points onto the new ones, and points move the opposite way: if you drive one metre towards a wall, the wall comes one metre closer. So the code turns the guess around before it starts. The guess becomes a three by three matrix, starting as the identity, which means no motion. Why three by three for a flat motion? It holds the rotation and the shift in one matrix, and two motions combine by simply multiplying their matrices. The cosine and minus sine of the guessed turn go top left, and the forward shift goes into the last column. Then it’s inverted: .inverse() turns the robot’s motion into the points’ motion. Every old point is moved by the inverted guess, rotate then shift, so ICP starts close to the answer and only fixes what the guess got wrong. T_total collects all steps and starts at the guess. Finally a kd-tree is built on the new scan. It finds the nearest point quickly, without checking all two hundred and fifty. It’s built on the new scan because that’s the set we search in, and the new scan never moves, so one tree serves all twenty rounds.</aside>
+</section>
+</div><div class="notes"><b>Slide 17 · speaker notes</b>The guess from TASK 2 says how the robot moved. But ICP moves the old points onto the new ones, and points move the opposite way: if you drive one metre towards a wall, the wall comes one metre closer. So the code turns the guess around before it starts. The guess becomes a three by three matrix, starting as the identity, which means no motion. Why three by three for a flat motion? It holds the rotation and the shift in one matrix, and two motions combine by simply multiplying their matrices. The cosine and minus sine of the guessed turn go top left, and the forward shift goes into the last column. Then it’s inverted: .inverse() turns the robot’s motion into the points’ motion. Every old point is moved by the inverted guess, rotate then shift, so ICP starts close to the answer and only fixes what the guess got wrong. T_total collects all steps and starts at the guess. Finally a kd-tree is built on the new scan. It finds the nearest point quickly, without checking all two hundred and fifty. It’s built on the new scan because that’s the set we search in, and the new scan never moves, so one tree serves all twenty rounds.</div></div>
+<div class="pair" id="steps"><div class="frame"><section id="steps">
+<div class="head">
+<p class="eyebrow">TASK 3 · LINES 519–590 · AT MOST 20 ROUNDS</p>
+<h2>One round of the loop has seven steps</h2>
+</div>
+<table style="font-size:28px">
+<tr><th style="width:8%">step</th><th style="width:40%">what</th><th>why</th></tr>
+<tr><td>1</td><td>pair each old point with its nearest new point (&lt; 1 m)</td><td>the kd-tree returns squared distances: d² &lt; 1 without a square root</td></tr>
+<tr><td>2</td><td>centres of both pair sets</td><td>once R is known, the shift is the difference of the centres</td></tr>
+<tr><td>3</td><td>H = Σ (s − s̄)(t − t̄)ᵀ</td><td>subtracting the centres removes the shift</td></tr>
+<tr><td>4</td><td>SVD: R = V·Uᵀ, then t = t̄ − R·s̄</td><td>Kabsch: the best rotation in closed form</td></tr>
+<tr><td>5</td><td>move the old points by R, t</td><td>next round the pairs get better</td></tr>
+<tr><td>6</td><td>T_total = T_step · T_total</td><td>the newest step goes on the left</td></tr>
+<tr><td>7</td><td>stop if |t| &lt; 0.1 mm and |angle| &lt; 0.0001 rad</td><td>more rounds change nothing measurable</td></tr>
+</table>
+<aside>One round has seven steps. Step one pairs every old point with its nearest new point, keeping only pairs closer than one metre. Steps two and three compute the centres of both point sets, and how the shapes are turned against each other. Step four finds the best rotation and shift. Steps five and six move the old points and add the step to the total. Step seven stops when the step is tiny. The loop runs at most twenty rounds; it usually stops earlier, and twenty only caps the time per scan, since a new scan comes every fifty milliseconds. If fewer than three pairs are left, the loop stops, because the rotation and shift can’t be determined reliably.</aside>
+</section>
+</div><div class="notes"><b>Slide 18 · speaker notes</b>One round has seven steps. Step one pairs every old point with its nearest new point, keeping only pairs closer than one metre. Steps two and three compute the centres of both point sets, and how the shapes are turned against each other. Step four finds the best rotation and shift. Steps five and six move the old points and add the step to the total. Step seven stops when the step is tiny. The loop runs at most twenty rounds; it usually stops earlier, and twenty only caps the time per scan, since a new scan comes every fifty milliseconds. If fewer than three pairs are left, the loop stops, because the rotation and shift can’t be determined reliably.</div></div>
+<div class="pair" id="loop1"><div class="frame"><section id="loop1" class="alt">
+<div class="head">
+<p class="eyebrow">TASK 3 · STEP 1 · LINES 522–539</p>
+<h2>Step 1: pairs</h2>
+</div>
+<div class="row">
+<div class="col2">
+<p class="code">std::vector&lt;Eigen::Vector2d&gt; src_pts, tgt_pts;<br><span class="k">for</span> (<span class="k">const auto</span> &amp;p : src_transformed-&gt;points)<br>{<br>&#160; <span class="k">if</span> (kdtree.nearestKSearch(p, 1, nn_idx, nn_dist_sq) &gt; 0<br>&#160; &#160; &#160; &amp;&amp; nn_dist_sq[0] &lt; 1.0)<br>&#160; {<br>&#160; &#160; <span class="k">const auto</span> &amp;q = (*tgt_cloud)[nn_idx[0]];<br>&#160; &#160; src_pts.emplace_back(p.x, p.y);<br>&#160; &#160; tgt_pts.emplace_back(q.x, q.y);<br>&#160; }<br>}<br><span class="k">if</span> (src_pts.size() &lt; 3) <span class="k">break</span>;</p>
+</div>
+<div class="col">
+<div class="card cpp"><p class="tag">C++</p><p>std::vector: a list that can grow. for (const auto &amp;p : list) gives each element in turn, without copying it.</p></div>
+<div class="card why"><p class="tag">WHY d² &lt; 1.0</p><p>The tree already returns squared distances: d² &lt; 1 means d &lt; 1 m, no square root needed.</p></div>
+<div class="card warn"><p class="tag">TRAP</p><p>A pair exactly 1 m apart is rejected: 1.0 &lt; 1.0 is false.</p></div>
+</div>
+</div>
+<aside>Each round starts with two empty lists: the old points that found a partner, and their partners. In C++, a vector is a list that can grow. Step one: pairs. The loop goes over every old point; this kind of for loop gives each element in turn, by reference, without copying it. The kd-tree finds the one nearest new point. The pair is kept only if the squared distance is below one, so closer than one metre. The tree already returns squared distances, so comparing with one needs no square root. One trap in worked examples: a pair exactly one metre apart is rejected, because one is not smaller than one. If it’s close enough, the partner is looked up by its index and both points are added to the lists. With fewer than three pairs, the loop stops. Testat question: why one metre, not more or less? Too big, and points pair up with different objects. Too small, and there are no pairs when the guess is a bit off. Between two scans fifty milliseconds apart the robot moves about five centimetres, so one metre leaves a large margin.</aside>
+</section>
+</div><div class="notes"><b>Slide 19 · speaker notes</b>Each round starts with two empty lists: the old points that found a partner, and their partners. In C++, a vector is a list that can grow. Step one: pairs. The loop goes over every old point; this kind of for loop gives each element in turn, by reference, without copying it. The kd-tree finds the one nearest new point. The pair is kept only if the squared distance is below one, so closer than one metre. The tree already returns squared distances, so comparing with one needs no square root. One trap in worked examples: a pair exactly one metre apart is rejected, because one is not smaller than one. If it’s close enough, the partner is looked up by its index and both points are added to the lists. With fewer than three pairs, the loop stops. Testat question: why one metre, not more or less? Too big, and points pair up with different objects. Too small, and there are no pairs when the guess is a bit off. Between two scans fifty milliseconds apart the robot moves about five centimetres, so one metre leaves a large margin.</div></div>
+<div class="pair" id="loop2"><div class="frame"><section id="loop2">
+<div class="head">
+<p class="eyebrow">TASK 3 · STEPS 2–4 · LINES 541–569</p>
+<h2>Centres, the matrix H, and the best rotation</h2>
+</div>
+<div class="row">
+<div class="col2">
+<p class="code"><span class="c">// 2) centres: add up, divide by the count</span><br>src_mean /= static_cast&lt;<span class="k">double</span>&gt;(src_pts.size());<br><span class="c">// 3) cross-covariance of the centred pairs</span><br>H += (src_pts[i] - src_mean) * (tgt_pts[i] - tgt_mean).transpose();<br><span class="c">// 4) SVD gives the best rotation, then the shift</span><br>Eigen::JacobiSVD&lt;Matrix2d&gt; svd(H, ComputeFullU | ComputeFullV);<br>Matrix2d R = V * svd.matrixU().transpose();<br><span class="k">if</span> (R.determinant() &lt; 0) { V.col(1) *= -1.0; R = V * Uᵀ; }<br>Vector2d t = tgt_mean - R * src_mean;</p></div>
+<div class="col">
+<div class="card why"><p class="tag">WHY SUBTRACT THE CENTRES</p><p>It removes the shift: H only holds how the two shapes are turned.</p></div>
+<div class="card why"><p class="tag">WHY THE SVD</p><p>Kabsch method: the rotation that minimises Σ‖R s + t − t′‖² is R = V·Uᵀ, in closed form.</p></div>
+<div class="card why"><p class="tag">WHY det &lt; 0</p><p>Then R is a mirror image; flipping V’s last column gives the best real rotation.</p></div>
+</div>
+</div>
+<aside>Step two: the centres. The centre of the old points and the centre of their partners are just averages: add everything up, then divide by the count. static_cast turns the count into a decimal number; in C++ it’s the safe, explicit way to convert a type. Once the rotation is known, the shift is just the difference of the two centres. Step three: the matrix H. For every pair it takes the old point minus its centre, times the new point minus its centre turned into a row. Subtracting the centres removes the shift, so what’s left in H is only how the two shapes are turned against each other. Step four: the singular value decomposition splits H into U, sigma and V. This is the Kabsch method: it gives the best rotation directly, R equals V times U transposed, with no searching. One check: if R’s determinant is negative, R is a mirror image, not a rotation; flipping the last column of V gives the best real rotation. Then the shift is the new centre minus the rotated old centre. Testat question: where does R = V·Uᵀ come from? We want the rotation that makes the summed squared gaps smallest. With centred points that’s the same as maximising the trace of R times H, and the SVD gives that maximum at V Uᵀ.</aside>
+</section>
+</div><div class="notes"><b>Slide 20 · speaker notes</b>Step two: the centres. The centre of the old points and the centre of their partners are just averages: add everything up, then divide by the count. static_cast turns the count into a decimal number; in C++ it’s the safe, explicit way to convert a type. Once the rotation is known, the shift is just the difference of the two centres. Step three: the matrix H. For every pair it takes the old point minus its centre, times the new point minus its centre turned into a row. Subtracting the centres removes the shift, so what’s left in H is only how the two shapes are turned against each other. Step four: the singular value decomposition splits H into U, sigma and V. This is the Kabsch method: it gives the best rotation directly, R equals V times U transposed, with no searching. One check: if R’s determinant is negative, R is a mirror image, not a rotation; flipping the last column of V gives the best real rotation. Then the shift is the new centre minus the rotated old centre. Testat question: where does R = V·Uᵀ come from? We want the rotation that makes the summed squared gaps smallest. With centred points that’s the same as maximising the trace of R times H, and the SVD gives that maximum at V Uᵀ.</div></div>
+<div class="pair" id="loop3"><div class="frame"><section id="loop3" class="alt">
+<div class="head">
+<p class="eyebrow">TASK 3 · STEPS 5–7 · LINES 571–589</p>
+<h2>Move, add up, stop</h2>
+</div>
+<div class="row">
+<div class="col2">
+<p class="code"><span class="c">// 5) move the old points by this round's R and t</span><br><span class="k">double</span> x_new = R(0,0) * p.x + R(0,1) * p.y + t(0);<br>p.x = static_cast&lt;<span class="k">float</span>&gt;(x_new); <span class="c">// PCL stores floats</span><br><br><span class="c">// 6) add this step to the total</span><br>T_step.block&lt;2, 2&gt;(0, 0) = R;<br>T_step.block&lt;2, 1&gt;(0, 2) = t;<br>T_total = T_step * T_total;<br><br><span class="c">// 7) stop when the step is tiny</span><br><span class="k">if</span> (t.norm() &lt; 1e-4 &amp;&amp; std::abs(step_angle) &lt; 1e-4) <span class="k">break</span>;</p>
+</div>
+<div class="col">
+<div class="card cpp"><p class="tag">C++</p><p>.block&lt;rows, cols&gt;(row, col): the part of the matrix starting at (row, col).</p></div>
+<div class="card why"><p class="tag">WHY T_step · T_total</p><p>T_total maps the original points to before this step; the new step comes after it, and products apply right to left.</p></div>
+<div class="card why"><p class="tag">WHY 1e-4</p><p>Under 0.1 mm and 0.0001 rad, more rounds change nothing measurable.</p></div>
+</div>
+</div>
+<aside>Step five: every old point is moved by this round’s rotation and shift. In the next round the nearest neighbours change, so the pairs get better. The results are stored as float with static_cast, because PCL stores points as float. Step six: the step becomes a matrix. R goes top left and t goes into the last column; in C++, block picks a part of a matrix: its size in the angle brackets, its corner in the round ones. Then it’s added to the total: T_step times T_total. The newest step goes on the left, because it happens after all the earlier ones and matrix products apply from right to left. Step seven: stop when the step is tiny, less than a tenth of a millimetre and less than a ten-thousandth of a radian. More rounds would change nothing you could measure.</aside>
+</section>
+</div><div class="notes"><b>Slide 21 · speaker notes</b>Step five: every old point is moved by this round’s rotation and shift. In the next round the nearest neighbours change, so the pairs get better. The results are stored as float with static_cast, because PCL stores points as float. Step six: the step becomes a matrix. R goes top left and t goes into the last column; in C++, block picks a part of a matrix: its size in the angle brackets, its corner in the round ones. Then it’s added to the total: T_step times T_total. The newest step goes on the left, because it happens after all the earlier ones and matrix products apply from right to left. Step seven: stop when the step is tiny, less than a tenth of a millimetre and less than a ten-thousandth of a radian. More rounds would change nothing you could measure.</div></div>
+<div class="pair" id="stats"><div class="frame"><section id="stats">
+<div class="head">
+<p class="eyebrow">TASK 3 · STATISTICS AND RESULT · LINES 593–628</p>
+<h2>What icp() returns</h2>
+</div>
+<div class="row">
+<div class="card"><p class="tag">N · PAIRS</p><p class="big teal">248</p><p>pairs again after the loop, same 1 m limit</p></div>
+<div class="card"><p class="tag">RESIDUAL RMS</p><p class="big">0.165 m</p><p>the typical leftover gap between partners</p></div>
+<div class="card"><p class="tag">AVERAGE RADIUS</p><p class="big green">21.9 m</p><p>how far the points are from the robot</p></div>
+</div>
+<div class="row">
+<p class="code" style="flex:1.4">Eigen::Matrix3d T_robot = T_total.inverse();<br>res.delta = Vector3d(T_robot(0, 2), T_robot(1, 2),<br>&#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;atan2(T_robot(1, 0), T_robot(0, 0)));</p>
+<div class="card why" style="flex:1"><p class="tag">THE INVERSE TRICK IN REVERSE</p><p>T_total says how the points moved; inverting it gives how the robot moved: forward, sideways, turn.</p></div>
+</div>
+<aside>After the loop, the pairs are formed once more, with the same one metre limit, to measure how good the fit is. For each pair the squared gap is added up, and the partner’s distance from the robot; Part 4 needs that, because a small turn moves far points a lot. N counts the pairs. The residual is the root mean square of the gaps: the typical leftover distance between partners. On the bag, typically about two hundred and fifty pairs, sixteen centimetres, and twenty two metres; these are medians. Finally, the inverse trick in reverse: T_total says how the points moved, and inverting it gives how the robot moved. The result is three numbers, forward, sideways and the turn angle, read from the matrix with atan2. Testat question: does a small residual mean the match is right? No. Along a long wall, point-to-point ICP can slide: every point still finds a close partner, so the residual stays small while the motion is wrong. It measures fit, not whether the motion is determined.</aside>
+</section>
+</div><div class="notes"><b>Slide 22 · speaker notes</b>After the loop, the pairs are formed once more, with the same one metre limit, to measure how good the fit is. For each pair the squared gap is added up, and the partner’s distance from the robot; Part 4 needs that, because a small turn moves far points a lot. N counts the pairs. The residual is the root mean square of the gaps: the typical leftover distance between partners. On the bag, typically about two hundred and fifty pairs, sixteen centimetres, and twenty two metres; these are medians. Finally, the inverse trick in reverse: T_total says how the points moved, and inverting it gives how the robot moved. The result is three numbers, forward, sideways and the turn angle, read from the matrix with atan2. Testat question: does a small residual mean the match is right? No. Along a long wall, point-to-point ICP can slide: every point still finds a close partner, so the residual stays small while the motion is wrong. It measures fit, not whether the motion is determined.</div></div>
+<div class="pair" id="icpqa"><div class="frame"><section id="icpqa" class="alt">
+<div class="head">
+<p class="eyebrow">TASK 3 · TESTAT QUESTIONS</p>
+<h2>Questions you might get on the ICP loop</h2>
+</div>
+<div class="row">
+<div class="col">
+<div class="qa"><h3>Why 1 m as the pair limit?</h3><p>Too big: pairs with other objects. Too small: no pairs if the guess is a bit off. The robot moves ~5 cm between scans.</p></div>
+<div class="qa"><h3>Where does R = V·Uᵀ come from?</h3><p>Minimise Σ‖R s + t − t′‖². With centred points: maximise trace(R H); the SVD of H gives the maximum at V·Uᵀ.</p></div>
+</div>
+<div class="col">
+<div class="qa"><h3>Why T_step · T_total?</h3><p>T_total maps the original points to before this step; the new step comes after it; products apply right to left.</p></div>
+<div class="qa"><h3>Does a small residual mean the match is right?</h3><p>No. Along a long wall point-to-point ICP slides: every point keeps a close partner while the motion is wrong.</p></div>
+</div>
+</div>
+<aside>Four questions you might get on the loop. Why one metre as the pair limit? Too big, and points pair up with different objects; too small, and there are no pairs when the guess is a bit off; the robot moves about five centimetres between scans, so one metre leaves a large margin. Where does R = V Uᵀ come from? We want the rotation that makes the summed squared gaps smallest; with centred points that’s the same as maximising the trace of R times H, and the SVD gives that maximum at V Uᵀ. Why T_step times T_total and not the other way round? T_total maps the original points to where they were before this step, the new step is applied after that, and matrix products apply from right to left, so the newest goes on the left. Does a small residual mean the match is right? No: along a long wall, every point still finds a close partner, so the residual stays small while the motion is wrong. It measures fit, not whether the motion is determined.</aside>
+</section>
+</div><div class="notes"><b>Slide 23 · speaker notes</b>Four questions you might get on the loop. Why one metre as the pair limit? Too big, and points pair up with different objects; too small, and there are no pairs when the guess is a bit off; the robot moves about five centimetres between scans, so one metre leaves a large margin. Where does R = V Uᵀ come from? We want the rotation that makes the summed squared gaps smallest; with centred points that’s the same as maximising the trace of R times H, and the SVD gives that maximum at V Uᵀ. Why T_step times T_total and not the other way round? T_total maps the original points to where they were before this step, the new step is applied after that, and matrix products apply from right to left, so the newest goes on the left. Does a small residual mean the match is right? No: along a long wall, every point still finds a close partner, so the residual stays small while the motion is wrong. It measures fit, not whether the motion is determined.</div></div>
+<p class="part">Part 4: ICP in the Kalman filter, pure-ICP mode, launch parameters, results and quiz.</p>
+<div class="pair" id="p4"><div class="frame"><section id="p4" class="parthead">
+<p class="eyebrow">PART 4</p>
+<p class="num">04</p>
+<h2>ICP in the filter, and results</h2>
+<ul>
+<li>ICP into the Kalman filter, and how sure ICP is (FIX 2)</li>
+<li>pure-ICP mode and the launch parameters</li>
+<li>results on the bag, and a quick quiz</li>
+</ul>
+<aside>Part 4 follows ICP’s result into the Kalman filter, shows how the filter decides how much to trust it, looks at the pure-ICP mode and the launch parameters, and finishes with the results on the bag and a short quiz.</aside>
+</section>
+</div><div class="notes"><b>Slide 24 · speaker notes</b>Part 4 follows ICP’s result into the Kalman filter, shows how the filter decides how much to trust it, looks at the pure-ICP mode and the launch parameters, and finishes with the results on the bag and a short quiz.</div></div>
+<div class="pair" id="fusion"><div class="frame"><section id="fusion">
+<div class="head">
+<p class="eyebrow">FUSION · LINES 394–402</p>
+<h2>ICP enters the filter as a speed</h2>
+</div>
+<div class="row">
+<div class="col2">
+<p class="code"><span class="k">if</span> (use_icp_ &amp;&amp; !icp_only_)<br>{<br>&#160; <span class="k">auto</span> res = icp(last_cloud_base_, cloud_in_base, guess_robot_base);<br>&#160; <span class="k">if</span> (res.inliers &gt;= 10)<br>&#160; {<br>&#160; &#160; <span class="k">double</span> meas_vx = res.delta(0) / dt_scan; <span class="c">// forward speed</span><br>&#160; &#160; <span class="k">double</span> meas_w &#160;= res.delta(2) / dt_scan; <span class="c">// turn rate</span><br>&#160; &#160; <span class="c">// … z = [meas_vx, meas_w], H rows 3 and 4</span></p>
+</div>
+<div class="col">
+<div class="card why"><p class="tag">WHY AT LEAST 10 PAIRS</p><p>With fewer, the match can’t be trusted, and the scan isn’t used.</p></div>
+<div class="card why"><p class="tag">WHY A SPEED</p><p>ICP measures a change between two scans, not a position. Divided by dt it’s the same kind of measurement as the wheels, so the same H rows work.</p></div>
+</div>
+</div>
+<aside>ICP’s result goes into the Kalman filter, still inside scanCallback, right after TASK 3. This block runs only when use_icp is on and icp_only is off. First a check: at least ten pairs. With fewer, the match isn’t trustworthy and the scan isn’t used. ICP measured a change between two scans. Divided by dt, the forward shift becomes a speed and the turn becomes a turn rate. That’s the same kind of measurement as the wheels, so the filter can use the same H rows: row zero measures state entry three, the speed, and row one measures entry four, the turn rate. Testat question: why does ICP enter as a speed? Because it measures a change between scans, not an absolute pose.</aside>
+</section>
+</div><div class="notes"><b>Slide 25 · speaker notes</b>ICP’s result goes into the Kalman filter, still inside scanCallback, right after TASK 3. This block runs only when use_icp is on and icp_only is off. First a check: at least ten pairs. With fewer, the match isn’t trustworthy and the scan isn’t used. ICP measured a change between two scans. Divided by dt, the forward shift becomes a speed and the turn becomes a turn rate. That’s the same kind of measurement as the wheels, so the filter can use the same H rows: row zero measures state entry three, the speed, and row one measures entry four, the turn rate. Testat question: why does ICP enter as a speed? Because it measures a change between scans, not an absolute pose.</div></div>
+<div class="pair" id="noise"><div class="frame"><section id="noise" class="alt">
+<div class="head">
+<p class="eyebrow">FIX 2 · LINES 420–424</p>
+<h2>How sure is ICP?</h2>
+</div>
+<div class="row">
+<div class="col2">
+<p class="code"><span class="k">const double</span> sigma_trans = residual_rms; <span class="c">// ≈ 0.165 m</span><br><span class="k">const double</span> sigma_angle = residual_rms / std::max(avg_radius, 1.0);<br><br><span class="k">double</span> sigma_v = std::clamp(sigma_trans / dt_scan, 0.05, 5.0);<br><span class="k">double</span> sigma_w = std::clamp(sigma_angle / dt_scan, 0.01, 2.0);</p>
+<div class="card why"><p class="tag">WHY THESE FORMULAS</p><p>The leftover gap is the position error of one scan. A turn by α moves a point at distance r by r·α, so α ≈ gap / r. z is a speed, so its error must be one too: divide by dt.</p></div>
+</div>
+<div class="col">
+<div class="card warn"><p class="tag">ORIGINAL: σ = rms / √N</p><p class="big red">16×</p><p>too precise (N ≈ 248, √N ≈ 16)</p></div>
+<div class="card warn"><p class="tag">ORIGINAL: σ_ω WITHOUT / dt</p><p class="big red">20×</p><p>too small: ICP overruled wheels and gyro; fused path 2.7 m short</p></div>
+</div>
+</div>
+<aside>The filter weighs every sensor by its uncertainty, sigma. For ICP, sigma comes from the leftover gap, the residual from Part 3. The original formula made ICP look about sixteen times too precise, so this block was fixed. The position error per scan is the residual itself, about sixteen centimetres on the bag. For the angle, the residual is divided by the average radius: a turn by a small angle moves a point at distance r by r times that angle, so the angle error is the gap divided by r; the max with one avoids dividing by almost zero. Both are divided by dt, because the measurement is a speed, so its error must be a speed error too; clamp keeps them inside sensible limits. The original divided the residual by the square root of N. With about two hundred and fifty pairs that’s sixteen times smaller. It also forgot dt for the turn rate, twenty times too small. So ICP overruled the wheels and the gyroscope, and the fused path came out 2.7 metres short. Testat question: why was rms over root N replaced? It assumes N independent measurements, but neighbouring lidar points lie on the same wall, make the same error, and slide together.</aside>
+</section>
+</div><div class="notes"><b>Slide 26 · speaker notes</b>The filter weighs every sensor by its uncertainty, sigma. For ICP, sigma comes from the leftover gap, the residual from Part 3. The original formula made ICP look about sixteen times too precise, so this block was fixed. The position error per scan is the residual itself, about sixteen centimetres on the bag. For the angle, the residual is divided by the average radius: a turn by a small angle moves a point at distance r by r times that angle, so the angle error is the gap divided by r; the max with one avoids dividing by almost zero. Both are divided by dt, because the measurement is a speed, so its error must be a speed error too; clamp keeps them inside sensible limits. The original divided the residual by the square root of N. With about two hundred and fifty pairs that’s sixteen times smaller. It also forgot dt for the turn rate, twenty times too small. So ICP overruled the wheels and the gyroscope, and the fused path came out 2.7 metres short. Testat question: why was rms over root N replaced? It assumes N independent measurements, but neighbouring lidar points lie on the same wall, make the same error, and slide together.</div></div>
+<div class="pair" id="gain"><div class="frame"><section id="gain">
+<div class="head">
+<p class="eyebrow">FUSION · LINES 432–454</p>
+<h2>icp_gain and the Kalman update</h2>
+</div>
+<div class="row">
+<div class="col2">
+<p class="code">Ez(0, 0) = sigma_v * sigma_v; &#160;<span class="c">// variance = σ²</span><br>Ez(1, 1) = sigma_w * sigma_w;<br><span class="k">if</span> (icp_gain_ &gt; 1e-6) Ez /= icp_gain_;<br><br>S = H * Ex * Hᵀ + Ez; &#160; &#160; &#160; &#160;<span class="c">// uncertainty of the difference</span><br>K = Ex * Hᵀ * S⁻¹; &#160; &#160; &#160; &#160; &#160; <span class="c">// Kalman gain</span><br>x += K * (z - H * x); &#160; &#160; &#160; &#160;<span class="c">// measured − expected</span><br>Ex = (I - K H) Ex (I - K H)ᵀ + K Ez Kᵀ; <span class="c">// Joseph form</span></p>
+<div class="card cpp"><p class="tag">C++</p><p>x /= y means x = x / y.</p></div>
+</div>
+<div class="col">
+<div class="card"><h3>on the bag</h3><p>σ_v ≈ 3.3 m/s: the speed comes from the wheels. σ_ω ≈ 0.15 rad/s: ICP still counts for the turn rate.</p></div>
+<div class="card"><h3>icp_gain (simulation)</h3><p>0.01 → 2.0 m end error · 2 → 4.5 m · 10 → 9.9 m. It can’t fix sliding; it only changes the trust.</p></div>
+<div class="card why"><p class="tag">WHY JOSEPH FORM</p><p>Stays symmetric and positive even with rounding errors.</p></div>
+</div>
+</div>
+<aside>The variances go into Ez: sigma squared. Then Ez is divided by icp_gain. A gain of two halves the variance, so ICP counts twice as much. In C++, slash-equals means divide and store. On the bag, sigma v is about three metres per second, so the speed comes from the wheels, while ICP still counts for the turn rate. The update is the usual Kalman correction: S is the uncertainty of the difference, K is the Kalman gain, and the innovation is measured minus expected. The covariance uses the Joseph form: it’s longer, but it stays symmetric and positive even with rounding errors; the short form (I − K H) Ex can lose symmetry. Testat question: what does icp_gain do, and what value would you choose? Ez is divided by it, so two means trust ICP twice as much. In the simulation with a corridor, a gain of 0.01 ended two metres off, two ended four and a half, and ten almost ten. The gain can’t fix sliding; it only changes how much the filter listens. On the open field, keep it at two or below.</aside>
+</section>
+</div><div class="notes"><b>Slide 27 · speaker notes</b>The variances go into Ez: sigma squared. Then Ez is divided by icp_gain. A gain of two halves the variance, so ICP counts twice as much. In C++, slash-equals means divide and store. On the bag, sigma v is about three metres per second, so the speed comes from the wheels, while ICP still counts for the turn rate. The update is the usual Kalman correction: S is the uncertainty of the difference, K is the Kalman gain, and the innovation is measured minus expected. The covariance uses the Joseph form: it’s longer, but it stays symmetric and positive even with rounding errors; the short form (I − K H) Ex can lose symmetry. Testat question: what does icp_gain do, and what value would you choose? Ez is divided by it, so two means trust ICP twice as much. In the simulation with a corridor, a gain of 0.01 ended two metres off, two ended four and a half, and ten almost ten. The gain can’t fix sliding; it only changes how much the filter listens. On the open field, keep it at two or below.</div></div>
+<div class="pair" id="pure"><div class="frame"><section id="pure" class="alt">
+<div class="head">
+<p class="eyebrow">PURE-ICP MODE · LINES 457–472</p>
+<h2>Without the filter: ICP straight into the pose</h2>
+</div>
+<div class="row">
+<div class="col2">
+<p class="code"><span class="k">else if</span> (icp_only_)<br>{<br>&#160; <span class="k">auto</span> res = icp(last_cloud_base_, cloud_in_base, Vector3d::Zero());<br>&#160; <span class="k">double</span> c = cos(state_.x(2)), s = sin(state_.x(2));<br>&#160; state_.x(0) += c * delta(0) - s * delta(1);<br>&#160; state_.x(1) += s * delta(0) + c * delta(1);<br>&#160; state_.x(2) += delta(2);<br>&#160; publishTF(current_scan_stamp);<br>}<br>*last_cloud_base_ = *cloud_in_base; <span class="c">// in every mode</span></p>
+</div>
+<div class="col">
+<div class="card why"><p class="tag">WHY START AT ZERO</p><p>The filter doesn’t run in this mode, so there’s no speed to guess from.</p></div>
+<div class="card why"><p class="tag">WHY ROTATE BY θ</p><p>delta is in the robot frame; rotate it into odom before adding, as in Exercise 2.</p></div>
+<div class="card why"><p class="tag">WHY ALWAYS THE LATEST SCAN</p><p>Even if ICP failed: an ever older scan would make the gap, and the error, grow.</p></div>
+</div>
+</div>
+<aside>In pure-ICP mode the filter doesn’t run. ICP’s motion is added straight to the pose, and the node publishes it. Here ICP starts at zero, because the filter doesn’t run in this mode, so there’s no speed to guess from. The motion is in the robot’s frame: it’s rotated by the heading into the odom frame and added to the pose, like the odometry in Exercise 2. This branch publishes the transform itself. In every mode, at the end, the new scan becomes the old one, even if ICP failed. Comparing against an ever older scan would make the gap, and the error, grow.</aside>
+</section>
+</div><div class="notes"><b>Slide 28 · speaker notes</b>In pure-ICP mode the filter doesn’t run. ICP’s motion is added straight to the pose, and the node publishes it. Here ICP starts at zero, because the filter doesn’t run in this mode, so there’s no speed to guess from. The motion is in the robot’s frame: it’s rotated by the heading into the odom frame and added to the pose, like the odometry in Exercise 2. This branch publishes the transform itself. In every mode, at the end, the new scan becomes the old one, even if ICP failed. Comparing against an ever older scan would make the gap, and the error, grow.</div></div>
+<div class="pair" id="launch"><div class="frame"><section id="launch">
+<div class="head">
+<p class="eyebrow">LAUNCH PARAMETERS · icp_odom.launch.py</p>
+<h2>Where the scan comes from</h2>
+</div>
+<div class="row">
+<div class="col">
+<p class="lead">The Ouster gives a 3D point cloud. pointcloud_to_laserscan cuts a horizontal slice and turns it into the 2D scan our node reads.</p>
+<table>
+<tr><th style="width:42%">parameter</th><th>value and meaning</th></tr>
+<tr><td>target_frame</td><td>os_lidar: heights from the lidar</td></tr>
+<tr><td>min / max_height</td><td>2.0 / 6.0 m above the lidar</td></tr>
+<tr><td>angle_increment</td><td>0.0087 rad = 0.5°, ~722 rays</td></tr>
+<tr><td>range_min / max</td><td>0.45 m (the robot) / 50 m</td></tr>
+<tr><td>use_inf</td><td>True: empty rays come as inf</td></tr>
+</table>
+</div>
+<div class="col">
+<div class="card why"><p class="tag">WHY 2 TO 6 M</p><p>2.5–6.5 m above ground: facades, roofs and tree tops stay put; people and vehicles below 2 m move.</p></div>
+<div class="qa"><h3>What if you change the slice?</h3><p>Higher min_height: fewer moving objects, but fewer points. Lower max_height: cuts leafy tree tops, which change every scan.</p></div>
+</div>
+</div>
+<aside>The Ouster lidar gives a three-D point cloud. A node called pointcloud_to_laserscan cuts a horizontal slice out of it and turns it into the two-D scan our node reads; its parameters are in the launch file. Heights are measured from the lidar’s own frame. The slice goes from two to six metres above the lidar, which is two and a half to six and a half metres above the ground: facades, roofs and tree tops, but not people or cars, which move. The angle step is 0.0087 radians, half a degree, about seven hundred and twenty rays. The range limits: forty five centimetres cuts off the robot itself, and fifty metres is the far limit. use_inf reports empty rays as infinity, which our loop skips. Testat question: why start the slice at two metres, and what if you change it? Below two metres people and vehicles move. A higher minimum removes more moving objects but leaves fewer points; a lower maximum cuts off leafy tree tops, which change shape every scan.</aside>
+</section>
+</div><div class="notes"><b>Slide 29 · speaker notes</b>The Ouster lidar gives a three-D point cloud. A node called pointcloud_to_laserscan cuts a horizontal slice out of it and turns it into the two-D scan our node reads; its parameters are in the launch file. Heights are measured from the lidar’s own frame. The slice goes from two to six metres above the lidar, which is two and a half to six and a half metres above the ground: facades, roofs and tree tops, but not people or cars, which move. The angle step is 0.0087 radians, half a degree, about seven hundred and twenty rays. The range limits: forty five centimetres cuts off the robot itself, and fifty metres is the far limit. use_inf reports empty rays as infinity, which our loop skips. Testat question: why start the slice at two metres, and what if you change it? Below two metres people and vehicles move. A higher minimum removes more moving objects but leaves fewer points; a lower maximum cuts off leafy tree tops, which change shape every scan.</div></div>
+<div class="pair" id="results"><div class="frame"><section id="results" class="alt">
+<div class="head">
+<p class="eyebrow">RESULTS · 40 S DRIVE, dlg_feldtage_24:cut</p>
+<h2>What the three fixes changed</h2>
+</div>
+<div class="row">
+<div class="card"><p class="tag">WHEELS</p><p class="big">26.3 m</p><p>down the field</p></div>
+<div class="card"><p class="tag">ICP ALONE</p><p class="big teal">22.3 m</p><p>about 15 % short</p></div>
+</div>
+<table>
+<tr><th style="width:30%">end of the drive (x, y, θ)</th><th style="width:35%">original</th><th>fixed</th></tr>
+<tr><td>no ICP</td><td>4.88, −26.22, −78.6°</td><td>1.74, −26.34, −90.0°</td></tr>
+<tr><td>ICP + filter</td><td>2.16, −23.48, −85.3°</td><td>2.25, −26.34, −88.0°</td></tr>
+<tr><td>bag with --loop</td><td>frozen at 44.5 s</td><td>resets, continues</td></tr>
+</table>
+<aside>On the real bag, the wheels end twenty six metres down the field. ICP alone ends at twenty two, about fifteen percent short. With the three fixes, the filter without ICP matches Exercise 4 again: the heading goes from minus 78.6 to minus 90 degrees, because the IMU topic changed. The fused filter keeps the wheels’ distance, minus 26.34 in y instead of minus 23.48, with the heading near the gyroscope. And the bag can loop: before, the robot froze at 44.5 seconds; now the filter resets and continues. The three fixes again: FIX 1, the reset when the bag loops; FIX 2, the ICP noise formula; FIX 3, the IMU topic.</aside>
+</section>
+</div><div class="notes"><b>Slide 30 · speaker notes</b>On the real bag, the wheels end twenty six metres down the field. ICP alone ends at twenty two, about fifteen percent short. With the three fixes, the filter without ICP matches Exercise 4 again: the heading goes from minus 78.6 to minus 90 degrees, because the IMU topic changed. The fused filter keeps the wheels’ distance, minus 26.34 in y instead of minus 23.48, with the heading near the gyroscope. And the bag can loop: before, the robot froze at 44.5 seconds; now the filter resets and continues. The three fixes again: FIX 1, the reset when the bag loops; FIX 2, the ICP noise formula; FIX 3, the IMU topic.</div></div>
+<div class="pair" id="whyshort"><div class="frame"><section id="whyshort">
+<div class="head">
+<p class="eyebrow">THE QUESTION ON THE SHEET</p>
+<h2>Why does ICP fall short here?</h2>
+</div>
+<div class="row">
+<div class="card warn"><p class="tag">WHY</p>
+<ul class="plain">
+<li>point-to-point ICP slides along walls and fences</li>
+<li>few rigid features 2–6 m up on an open field</li>
+<li>far points are sparse: 0.5° at 20 m ≈ 17 cm apart</li>
+<li>leafy tree tops change shape every scan</li>
+</ul></div>
+<div class="card why"><p class="tag">BETTER APPROACHES</p>
+<ul class="plain">
+<li>point-to-line ICP (PL-ICP), GICP</li>
+<li>outlier rejection</li>
+<li>check the geometry before trusting ICP</li>
+<li>NDT</li>
+</ul></div>
+</div>
+<aside>This is the question on the sheet. Point-to-point ICP slides along walls: every point still finds a close partner, so it can’t see motion along the wall. The slice has few rigid features on an open field, far points are sparse, about seventeen centimetres apart at twenty metres, and leafy tree tops change shape every scan. Better approaches: point-to-line ICP measures the distance to the line through the neighbours, so sliding along a wall costs nothing and the residual shows the real error. Add outlier rejection, and a check whether the geometry pins down the motion at all before trusting ICP. NDT is another option.</aside>
+</section>
+</div><div class="notes"><b>Slide 31 · speaker notes</b>This is the question on the sheet. Point-to-point ICP slides along walls: every point still finds a close partner, so it can’t see motion along the wall. The slice has few rigid features on an open field, far points are sparse, about seventeen centimetres apart at twenty metres, and leafy tree tops change shape every scan. Better approaches: point-to-line ICP measures the distance to the line through the neighbours, so sliding along a wall costs nothing and the residual shows the real error. Add outlier rejection, and a check whether the geometry pins down the motion at all before trusting ICP. NDT is another option.</div></div>
+<div class="pair" id="quiz"><div class="frame"><section id="quiz" class="alt">
+<div class="head">
+<p class="eyebrow">QUICK QUIZ · ANSWER FIRST, THEN CLICK</p>
+<h2>Six questions</h2>
+</div>
+<div class="row">
+<div class="col">
+<div class="qa"><h3>What does getTransform return, and which way?</h3><p class="fragment">A rotation and shift from the sensor frame into base_footprint, or false.</p></div>
+<div class="qa"><h3>Why is the guess sideways zero?</h3><p class="fragment">Wheeled robots can’t slide sideways.</p></div>
+<div class="qa"><h3>Why invert the guess and the result?</h3><p class="fragment">ICP moves points, which move opposite to the robot.</p></div>
+</div>
+<div class="col">
+<div class="qa"><h3>Why R = V·Uᵀ, and what if det R &lt; 0?</h3><p class="fragment">Best least-squares rotation; flip V’s last column.</p></div>
+<div class="qa"><h3>Why does ICP enter the filter as a speed?</h3><p class="fragment">It measures a change between scans, not a position.</p></div>
+<div class="qa"><h3>Which three things were fixed?</h3><p class="fragment">Loop reset, ICP noise (no √N, σ_ω / dt), /imu/data_raw.</p></div>
+</div>
+</div>
+<aside>Pause on each question and answer it out loud before revealing the answer; each click shows the next one. getTransform returns a rotation and shift from the sensor frame into base_footprint, or false. The guess is sideways zero because wheeled robots can’t slide sideways. We invert the guess and the result because ICP moves points, and points move opposite to the robot. R = V Uᵀ is the best least-squares rotation, and if its determinant is negative you flip the last column of V. ICP enters the filter as a speed because it measures a change between scans, not a position. The three fixes: the reset when the bag loops, the ICP noise formula, and the IMU topic.</aside>
+</section>
+</div><div class="notes"><b>Slide 32 · speaker notes</b>Pause on each question and answer it out loud before revealing the answer; each click shows the next one. getTransform returns a rotation and shift from the sensor frame into base_footprint, or false. The guess is sideways zero because wheeled robots can’t slide sideways. We invert the guess and the result because ICP moves points, and points move opposite to the robot. R = V Uᵀ is the best least-squares rotation, and if its determinant is negative you flip the last column of V. ICP enters the filter as a speed because it measures a change between scans, not a position. The three fixes: the reset when the bag loops, the ICP noise formula, and the IMU topic.</div></div>
+<p class="part">Part 5: the node live in RViz, a known weakness, and four more questions.</p>
+<div class="pair" id="p5"><div class="frame"><section id="p5" class="parthead">
+<p class="eyebrow">PART 5</p>
+<p class="num">05</p>
+<h2>Live in RViz, and loose ends</h2>
+<ul>
+<li>the node running on the real bag, in RViz</li>
+<li>a known weakness: no predict before the ICP correction</li>
+<li>four more Testat questions</li>
+</ul>
+<aside>A short extra part. First the node running on the real bag, in RViz. Then a small weakness in the code that an examiner might ask about, and four more questions the first four parts left out. How the recording was made: pointcloud_to_laserscan cuts the slice with the launch file’s parameters; icp_node runs with use_icp true and icp_gain 2; the bag plays with --clock and its own /tf remapped to /tf_old. The bag already contains the robot’s recorded odom transform, and without the remap two publishers would fight over the same transform. RViz shows the scans, the frames and the path.</aside>
+</section>
+</div><div class="notes"><b>Slide 33 · speaker notes</b>A short extra part. First the node running on the real bag, in RViz. Then a small weakness in the code that an examiner might ask about, and four more questions the first four parts left out. How the recording was made: pointcloud_to_laserscan cuts the slice with the launch file’s parameters; icp_node runs with use_icp true and icp_gain 2; the bag plays with --clock and its own /tf remapped to /tf_old. The bag already contains the robot’s recorded odom transform, and without the remap two publishers would fight over the same transform. RViz shows the scans, the frames and the path.</div></div>
+<div class="pair" id="rviz"><div class="frame"><section id="rviz">
+<div class="head">
+<p class="eyebrow">FILTER + ICP ON dlg_feldtage_24:cut · END OF THE DRIVE · SEEN FROM ABOVE</p>
+<h2>The node live in RViz</h2>
+</div>
+<div class="row">
+<img src="rviz_end.jpg" alt="RViz top-down view at the end of the drive: teal lidar points from all scans form a map of walls, fences and trees, and an orange path runs about 26 m across the field" style="width:875px; height:640px; object-fit:contain; border-radius:12px; border:2px solid #34444F">
+<div class="col">
+<p style="color:var(--teal)">teal: lidar scans, kept for 60 s</p>
+<p style="color:var(--amber)">orange: the path, TF odom → base_footprint</p>
+<p>axes: the frames odom and base_footprint</p>
+<p style="color:var(--green)">sharp walls: the motion and the scans agree</p>
+<p class="small">one grid square: 5 m · the path is about 26 m, like the wheels</p>
+</div>
+</div>
+<aside>Here is the node running on the real bag, seen from above; this is the last frame of the recording in the Part 5 video. The teal points are the lidar scans. RViz keeps each scan on screen for a minute, so together they draw a map of the field. The orange line is the robot’s path: the transform odom to base_footprint that our node publishes. The two small sets of axes are the frames odom, where the robot started, and base_footprint, the robot itself. Watch the walls and the fences: every scan is drawn where our node says the robot was. If the motion estimate were wrong, the same wall would show up twice, shifted or smeared. Here the walls stay mostly sharp, so the motion and the scans agree. One grid square is five metres; by the end the robot has driven about twenty six metres, the same distance the wheels measured.</aside>
+</section>
+</div><div class="notes"><b>Slide 34 · speaker notes</b>Here is the node running on the real bag, seen from above; this is the last frame of the recording in the Part 5 video. The teal points are the lidar scans. RViz keeps each scan on screen for a minute, so together they draw a map of the field. The orange line is the robot’s path: the transform odom to base_footprint that our node publishes. The two small sets of axes are the frames odom, where the robot started, and base_footprint, the robot itself. Watch the walls and the fences: every scan is drawn where our node says the robot was. If the motion estimate were wrong, the same wall would show up twice, shifted or smeared. Here the walls stay mostly sharp, so the motion and the scans agree. One grid square is five metres; by the end the robot has driven about twenty six metres, the same distance the wheels measured.</div></div>
+<div class="pair" id="weakness"><div class="frame"><section id="weakness" class="alt">
+<div class="head">
+<p class="eyebrow">A KNOWN WEAKNESS · NOT FIXED, BUT WORTH KNOWING</p>
+<h2>No predict before the ICP correction</h2>
+</div>
+<div class="row">
+<div class="col2">
+<p class="code"><span class="c">// odomCallback, line 221: predict first, then correct</span><br>state_ = predict(state_, dt);<br><br><span class="c">// scanCallback, line 396: straight to the correction</span><br><span class="k">auto</span> res = icp(last_cloud_base_, cloud_in_base, guess);<br><br><span class="c">// the fix: before the correction</span><br>state_ = predict(state_, (stamp - filter_time_).seconds());<br>filter_time_ = stamp;</p>
+</div>
+<div class="col">
+<div class="card warn"><p class="tag">WHAT HAPPENS</p><p>ICP corrects the state of the last odom or IMU message, a few milliseconds before the scan.</p></div>
+<div class="card why"><p class="tag">WHY IT BARELY MATTERS</p><p>The gap is a few ms (odom 50 Hz, IMU 125 Hz), and ICP measures speeds, which hardly change in a few ms.</p></div>
+</div>
+</div>
+<aside>Every odometry and IMU callback calls predict before it corrects. The scan callback doesn’t. So ICP corrects the state of the last odometry or IMU message, a few milliseconds before the scan was taken. In the odometry callback, predict moves the state to the message’s time before the correction. In scanCallback, the correction starts right after ICP, with no predict in between. Strictly, it should first predict to the scan’s time stamp and update filter_time_. Why it barely matters here: the gap is at most a few milliseconds, because odometry and IMU arrive fifty and a hundred and twenty five times a second. And ICP measures speeds, not a position, and a speed hardly changes in a few milliseconds, so the error is tiny. If you’re asked, name the fix: predict to the scan’s time first.</aside>
+</section>
+</div><div class="notes"><b>Slide 35 · speaker notes</b>Every odometry and IMU callback calls predict before it corrects. The scan callback doesn’t. So ICP corrects the state of the last odometry or IMU message, a few milliseconds before the scan was taken. In the odometry callback, predict moves the state to the message’s time before the correction. In scanCallback, the correction starts right after ICP, with no predict in between. Strictly, it should first predict to the scan’s time stamp and update filter_time_. Why it barely matters here: the gap is at most a few milliseconds, because odometry and IMU arrive fifty and a hundred and twenty five times a second. And ICP measures speeds, not a position, and a speed hardly changes in a few milliseconds, so the error is tiny. If you’re asked, name the fix: predict to the scan’s time first.</div></div>
+<div class="pair" id="extraqa"><div class="frame"><section id="extraqa">
+<div class="head">
+<p class="eyebrow">PART 5 · FOUR MORE QUESTIONS</p>
+<h2>Questions the first four parts left out</h2>
+</div>
+<div class="row">
+<div class="col">
+<div class="qa"><h3>A pair is exactly 1 m apart. Is it kept?</h3><p>No. The test is nn_dist_sq[0] &lt; 1.0, and 1.0 &lt; 1.0 is false.</p></div>
+<div class="qa"><h3>Why must σ_ω be divided by dt?</h3><p>z = Δθ / dt is a rate in rad/s; rms / r̄ is an angle error per scan. Without / dt it was 20× too small.</p></div>
+</div>
+<div class="col">
+<div class="qa"><h3>Finer angle step, or smaller range_max?</h3><p>Finer: more points, a little better (sim 18.1 → 14.9 m), more computation. Smaller range_max: worse (sim 20.4 m).</p></div>
+<div class="qa"><h3>What do the TF broadcaster and listener do?</h3><p>Broadcaster: publishes odom → base_footprint. Listener: fills the buffer from /tf and /tf_static, which getTransform asks.</p></div>
+</div>
+</div>
+<aside>Four more questions. A pair exactly one metre apart: is it kept? No. The test is squared distance smaller than one, and one is not smaller than one, so it’s rejected; a classic trap in worked examples. Why must sigma omega be divided by dt? The measurement is a turn rate in radians per second, but residual over radius is an angle error per scan, in radians. Dividing by dt turns it into a rate error; without it the error was twenty times too small and ICP overruled the gyroscope. Would a finer angle step or a smaller range_max help? A finer step gives more points and helps a little, at the cost of computation. A smaller maximum range made it worse in the simulation, because on an open field the far features are often the only clue to forward motion. What do the TF broadcaster and listener do? The broadcaster publishes our own result, odom to base_footprint. The listener subscribes to /tf and /tf_static and fills the buffer, and getTransform asks that buffer how each sensor is mounted.</aside>
+</section>
+</div><div class="notes"><b>Slide 36 · speaker notes</b>Four more questions. A pair exactly one metre apart: is it kept? No. The test is squared distance smaller than one, and one is not smaller than one, so it’s rejected; a classic trap in worked examples. Why must sigma omega be divided by dt? The measurement is a turn rate in radians per second, but residual over radius is an angle error per scan, in radians. Dividing by dt turns it into a rate error; without it the error was twenty times too small and ICP overruled the gyroscope. Would a finer angle step or a smaller range_max help? A finer step gives more points and helps a little, at the cost of computation. A smaller maximum range made it worse in the simulation, because on an open field the far features are often the only clue to forward motion. What do the TF broadcaster and listener do? The broadcaster publishes our own result, odom to base_footprint. The listener subscribes to /tf and /tf_static and fills the buffer, and getTransform asks that buffer how each sensor is mounted.</div></div>
+<div class="pair" id="end"><div class="frame"><section id="end" class="statement">
+<p class="eyebrow">THAT’S THE WHOLE NODE</p>
+<h1>Explain it in<br>your own words</h1>
+<p class="lead">getTransform · the inverse trick · the noise fix. If you can say those out loud, you’re ready.</p>
+<p class="lead">Look up any line on hover: <a href="https://claude.ai/artifact/7kw7yMKe887ie4zzRppLsk">ICP Node Explorer</a></p>
+<aside>That’s everything. The best test now is to explain getTransform, the inverse trick and the noise fix out loud, in your own words. For a short version, watch the overview video; for details, read the study guide and the cheatsheet. Good luck in the Testat.</aside>
+</section>
+</div><div class="notes"><b>Slide 37 · speaker notes</b>That’s everything. The best test now is to explain getTransform, the inverse trick and the noise fix out loud, in your own words. For a short version, watch the overview video; for details, read the study guide and the cheatsheet. Good luck in the Testat.</div></div></body></html>

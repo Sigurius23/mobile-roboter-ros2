@@ -1,0 +1,24 @@
+<section id="launch">
+<div class="head">
+<p class="eyebrow">LAUNCH PARAMETERS · icp_odom.launch.py</p>
+<h2>Where the scan comes from</h2>
+</div>
+<div class="row">
+<div class="col">
+<p class="lead">The Ouster gives a 3D point cloud. pointcloud_to_laserscan cuts a horizontal slice and turns it into the 2D scan our node reads.</p>
+<table>
+<tr><th style="width:42%">parameter</th><th>value and meaning</th></tr>
+<tr><td>target_frame</td><td>os_lidar: heights from the lidar</td></tr>
+<tr><td>min / max_height</td><td>2.0 / 6.0 m above the lidar</td></tr>
+<tr><td>angle_increment</td><td>0.0087 rad = 0.5°, ~722 rays</td></tr>
+<tr><td>range_min / max</td><td>0.45 m (the robot) / 50 m</td></tr>
+<tr><td>use_inf</td><td>True: empty rays come as inf</td></tr>
+</table>
+</div>
+<div class="col">
+<div class="card why"><p class="tag">WHY 2 TO 6 M</p><p>2.5–6.5 m above ground: facades, roofs and tree tops stay put; people and vehicles below 2 m move.</p></div>
+<div class="qa"><h3>What if you change the slice?</h3><p>Higher min_height: fewer moving objects, but fewer points. Lower max_height: cuts leafy tree tops, which change every scan.</p></div>
+</div>
+</div>
+<aside>The Ouster lidar gives a three-D point cloud. A node called pointcloud_to_laserscan cuts a horizontal slice out of it and turns it into the two-D scan our node reads; its parameters are in the launch file. Heights are measured from the lidar’s own frame. The slice goes from two to six metres above the lidar, which is two and a half to six and a half metres above the ground: facades, roofs and tree tops, but not people or cars, which move. The angle step is 0.0087 radians, half a degree, about seven hundred and twenty rays. The range limits: forty five centimetres cuts off the robot itself, and fifty metres is the far limit. use_inf reports empty rays as infinity, which our loop skips. Testat question: why start the slice at two metres, and what if you change it? Below two metres people and vehicles move. A higher minimum removes more moving objects but leaves fewer points; a lower maximum cuts off leafy tree tops, which change shape every scan.</aside>
+</section>

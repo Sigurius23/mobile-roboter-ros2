@@ -1,0 +1,16 @@
+<section id="fusion">
+<div class="head">
+<p class="eyebrow">FUSION · LINES 394–402</p>
+<h2>ICP enters the filter as a speed</h2>
+</div>
+<div class="row">
+<div class="col2">
+<p class="code"><span class="k">if</span> (use_icp_ &amp;&amp; !icp_only_)<br>{<br>&#160; <span class="k">auto</span> res = icp(last_cloud_base_, cloud_in_base, guess_robot_base);<br>&#160; <span class="k">if</span> (res.inliers &gt;= 10)<br>&#160; {<br>&#160; &#160; <span class="k">double</span> meas_vx = res.delta(0) / dt_scan; <span class="c">// forward speed</span><br>&#160; &#160; <span class="k">double</span> meas_w &#160;= res.delta(2) / dt_scan; <span class="c">// turn rate</span><br>&#160; &#160; <span class="c">// … z = [meas_vx, meas_w], H rows 3 and 4</span></p>
+</div>
+<div class="col">
+<div class="card why"><p class="tag">WHY AT LEAST 10 PAIRS</p><p>With fewer, the match can’t be trusted, and the scan isn’t used.</p></div>
+<div class="card why"><p class="tag">WHY A SPEED</p><p>ICP measures a change between two scans, not a position. Divided by dt it’s the same kind of measurement as the wheels, so the same H rows work.</p></div>
+</div>
+</div>
+<aside>ICP’s result goes into the Kalman filter, still inside scanCallback, right after TASK 3. This block runs only when use_icp is on and icp_only is off. First a check: at least ten pairs. With fewer, the match isn’t trustworthy and the scan isn’t used. ICP measured a change between two scans. Divided by dt, the forward shift becomes a speed and the turn becomes a turn rate. That’s the same kind of measurement as the wheels, so the filter can use the same H rows: row zero measures state entry three, the speed, and row one measures entry four, the turn rate. Testat question: why does ICP enter as a speed? Because it measures a change between scans, not an absolute pose.</aside>
+</section>

@@ -1,0 +1,18 @@
+<section id="task1why">
+<div class="head">
+<p class="eyebrow">TASK 1 · WHAT getTransform IS FOR</p>
+<h2>Every sensor measures relative to itself</h2>
+</div>
+<div class="row">
+<div class="col">
+<p class="lead">On this robot the lidar, os_lidar, sits 0.54 m up and is turned by 180°. In its own numbers, a wall in front of the robot shows up behind it.</p>
+<p class="lead">getTransform converts the lidar’s points into the robot’s frame, base_footprint, so everything the node compares is measured from the same place.</p>
+<p class="small">called in scanCallback (line 352), odomCallback (line 211), imuCallback (line 276)</p>
+</div>
+<div class="col">
+<div class="card"><p class="tag">REAL SCAN PAIR, STRAIGHT DRIVE</p><p class="big green">+0.68 m</p><p>with TF: forward, like the wheels (+0.63 m)</p></div>
+<div class="card warn"><p class="tag">WITHOUT TF</p><p class="big red">−0.68 m</p><p>the robot seems to drive backwards</p></div>
+</div>
+</div>
+<aside>Before reading any code, here is where TASK 1 sits. Every time the lidar sends a scan, the node runs scanCallback, and the first thing it does is call TASK 1, getTransform. The odometry and IMU callbacks call it too, for their own messages. Every sensor measures relative to itself. On this robot, the lidar sits fifty four centimetres up and is turned around by a hundred and eighty degrees, so in the lidar’s own numbers a wall in front of the robot shows up behind it. getTransform tells us how to convert the lidar’s points into the robot’s own frame, base_footprint; then everything the node compares is measured from the same place. Without it, ICP would compare points in the wrong frame. On our real scan pair, ICP then says minus 0.68 metres instead of plus 0.68: the robot would seem to drive backwards. That’s the “inverted” warning on the exercise sheet.</aside>
+</section>

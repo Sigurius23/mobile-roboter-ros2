@@ -1,0 +1,18 @@
+<section id="odomimu">
+<div class="head">
+<p class="eyebrow">04 · WHEELS AND GYROSCOPE · FIX 3</p>
+<h2>Odometry and IMU feed the filter</h2>
+</div>
+<div class="row">
+<div class="col">
+<div class="card"><h3>wheels: z = [v, ω], variance 0.1</h3><p>A differential drive measures forward speed (linear.x) and turn rate (angular.z). H(0,3) and H(1,4) pick state entries v and ω.</p></div>
+<div class="card cpp"><p class="tag">.linear() VS .matrix()</p><p>Speeds are directions: only the rotation applies. Points are positions: rotation and shift.</p></div>
+<div class="card"><h3>gyro: z = [ω], variance 0.05</h3><p>Trusted more than the wheels for turning: a gyroscope measures it directly, wheels slip in turns.</p></div>
+</div>
+<div class="col">
+<div class="card warn"><p class="tag">FIX 3: THE IMU TOPIC</p><p>/ouster/imu reads 0.006 rad/s while standing still: 14° over the 40 s bag. Now /imu/data_raw, the Phidget IMU.</p></div>
+<div class="card why"><p class="tag">WHY NO ACCELERATION</p><p>imu_use_acc_ ? 2 : 1, off by default. The Phidget’s TF gives it the wrong sign, the Ouster reads 0.5 m/s² standing, and the wheels measure v well anyway.</p></div>
+</div>
+</div>
+<aside>Now the wheels and the gyroscope. Their callbacks run between the scans, many times a second. The odometry message says in which frame its speeds are given, the child_frame_id. Linear x is the forward speed and angular z is the turn rate; a robot with two driven wheels measures exactly these two. If that frame isn’t base_footprint, TASK 1 looks up how it’s turned and both vectors are rotated with .linear(), the rotation part only, because speeds are directions: where a sensor is mounted doesn’t change a direction, only how it’s turned. In our bag the child frame already is base_footprint, so nothing changes. The measurement noise Ez is 0.1 for both wheel values; smaller means more trusted. The IMU: the robot has two. The default is now the Phidget IMU on /imu/data_raw. The original used the Ouster’s IMU, whose gyroscope reads 0.006 radians per second while standing still, fourteen degrees over the bag. The acceleration is off by default: the Phidget’s TF gives it the wrong sign, and the Ouster reads half a metre per second squared while standing. So z holds just the gyro turn rate, with variance 0.05.</aside>
+</section>

@@ -1,0 +1,16 @@
+<section id="task1choices">
+<div class="head">
+<p class="eyebrow">TASK 1 · THE CHOICES</p>
+<h2>Why getTransform is written this way</h2>
+</div>
+<table style="font-size:25px">
+<tr><th style="width:24%">choice</th><th style="width:44%">why</th><th>instead</th></tr>
+<tr><td>return true / false</td><td>each caller reacts differently: the scan is skipped, odom and IMU keep raw values</td><td>throwing: every callback needs its own try/catch</td></tr>
+<tr><td>try / catch</td><td>right after startup /tf_static may not be in the buffer yet</td><td>no catch: the node crashes on its first message</td></tr>
+<tr><td>target, then source</td><td>gives p_robot = T · p_sensor</td><td>swapped: the inverse, points in the wrong place</td></tr>
+<tr><td>the message’s stamp</td><td>right for moving joints and bag playback</td><td>now(): wrong time when playing a bag</td></tr>
+<tr><td>timeout 0.1 s</td><td>one thread: while it waits, no other callback runs</td><td>long timeout: odom and IMU pile up</td></tr>
+<tr><td>WARN_THROTTLE 2000</td><td>runs up to 125 times a second</td><td>plain WARN floods the terminal</td></tr>
+</table>
+<aside>Here are the choices behind getTransform in one table. True or false instead of an exception, because the callers react differently to a failure: the scan callback drops the scan, odometry and IMU keep their raw values, and with true or false each caller handles that with a simple if. The try/catch is there because right after startup the static transforms may not have arrived yet. We use the TF buffer because the lidar isn’t mounted directly on the robot’s base frame; it sits six frames away, and the buffer multiplies that whole chain for us. Target first, then source: in this order, the result moves sensor points into the robot frame; swapped, you get the opposite transform. The message’s own stamp is right for moving joints and for a bag played back later. The timeout is short because the node runs in one thread: while it waits, no other callback can run, and a new scan arrives every fifty milliseconds. The warning is throttled to once every two seconds because this function runs for every message, up to a hundred and twenty five times a second. Testat question: which way does lookupTransform(base_frame_, source_frame) convert? From the sensor frame into the base frame: p_base = T · p_sensor.</aside>
+</section>

@@ -1,0 +1,17 @@
+<section id="icpqa" class="alt">
+<div class="head">
+<p class="eyebrow">TASK 3 · TESTAT QUESTIONS</p>
+<h2>Questions you might get on the ICP loop</h2>
+</div>
+<div class="row">
+<div class="col">
+<div class="qa"><h3>Why 1 m as the pair limit?</h3><p>Too big: pairs with other objects. Too small: no pairs if the guess is a bit off. The robot moves ~5 cm between scans.</p></div>
+<div class="qa"><h3>Where does R = V·Uᵀ come from?</h3><p>Minimise Σ‖R s + t − t′‖². With centred points: maximise trace(R H); the SVD of H gives the maximum at V·Uᵀ.</p></div>
+</div>
+<div class="col">
+<div class="qa"><h3>Why T_step · T_total?</h3><p>T_total maps the original points to before this step; the new step comes after it; products apply right to left.</p></div>
+<div class="qa"><h3>Does a small residual mean the match is right?</h3><p>No. Along a long wall point-to-point ICP slides: every point keeps a close partner while the motion is wrong.</p></div>
+</div>
+</div>
+<aside>Four questions you might get on the loop. Why one metre as the pair limit? Too big, and points pair up with different objects; too small, and there are no pairs when the guess is a bit off; the robot moves about five centimetres between scans, so one metre leaves a large margin. Where does R = V Uᵀ come from? We want the rotation that makes the summed squared gaps smallest; with centred points that’s the same as maximising the trace of R times H, and the SVD gives that maximum at V Uᵀ. Why T_step times T_total and not the other way round? T_total maps the original points to where they were before this step, the new step is applied after that, and matrix products apply from right to left, so the newest goes on the left. Does a small residual mean the match is right? No: along a long wall, every point still finds a close partner, so the residual stays small while the motion is wrong. It measures fit, not whether the motion is determined.</aside>
+</section>

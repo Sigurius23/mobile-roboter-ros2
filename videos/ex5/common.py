@@ -62,14 +62,20 @@ def _short(line):
     return cut + " …"
 
 
-def code(first, last, size=17):
-    """Lines first..last of the fixed icp_node.cpp, numbered like the file."""
-    text = "\n".join(_short(s) for s in SRC_LINES[first - 1:last])
-    c = m.Code(code_string=text, language="cpp", line_numbers_from=first,
+def code(first, last, size=17, lines=None, language="cpp"):
+    """Lines first..last of the fixed icp_node.cpp, numbered like the file (or `lines` shown in their place)."""
+    if lines is None:
+        lines = [_short(s) for s in SRC_LINES[first - 1:last]]
+    text = "\n".join(lines)
+    c = m.Code(code_string=text, language=language, line_numbers_from=first,
                paragraph_config={"font_size": size, "line_spacing": 0.45},
                background_config={"stroke_color": "#33414d"})
     c.first_line = first
-    recolor_comments(c, [_short(s) for s in SRC_LINES[first - 1:last]])
+    if language == "python":  # the vim style draws Python strings dark purple: make the code light, numbers amber
+        for row, line in zip(c.code_lines, lines):
+            if len(row):
+                row.set_color(FG)
+    recolor_comments(c, lines)
     return c
 
 
@@ -81,6 +87,10 @@ def recolor_comments(c, lines):
     Each row of c.code_lines holds the line's glyphs without spaces."""
     for row, line in zip(c.code_lines, lines):
         k = line.find("//")
+        if k < 0 and line.lstrip().startswith("#"):
+            k = line.find("#")
+        elif k < 0 and "  # " in line:
+            k = line.find("  # ") + 2
         if k < 0 or len(row) == 0:
             continue
         before = len(line[:k].replace(" ", "").replace("\t", ""))

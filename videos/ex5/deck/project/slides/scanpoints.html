@@ -1,0 +1,17 @@
+<section id="scanpoints" class="alt">
+<div class="head">
+<p class="eyebrow">SCAN CALLBACK · LINES 337–368</p>
+<h2>From a scan to points in the robot frame</h2>
+</div>
+<div class="row">
+<div class="col2">
+<p class="code"><span class="k">double</span> angle = scan-&gt;angle_min;<br><span class="k">for</span> (size_t i = 0; i &lt; scan-&gt;ranges.size(); ++i) {<br>&#160; <span class="k">float</span> r = scan-&gt;ranges[i];<br>&#160; <span class="k">if</span> (std::isfinite(r) &amp;&amp; r &gt;= scan-&gt;range_min &amp;&amp; …)<br>&#160; &#160; cloud-&gt;emplace_back(r * cos(angle), r * sin(angle), 0);<br>&#160; angle += scan-&gt;angle_increment; <span class="c">// 0.5°</span><br>}<br><span class="k">if</span> (getTransform(frame_id, stamp, T_base_lidar))<br>&#160; pcl::transformPointCloud(…, T_base_lidar.matrix());<br><span class="k">else return</span>; <span class="c">// skip this scan</span><br><span class="k">if</span> (!have_last_scan_) { <span class="c">/* store it, return */</span> }</p>
+</div>
+<div class="col">
+<div class="card"><p class="tag">ABOUT 722 RAYS → ABOUT 250 POINTS</p><p>Only finite rays inside the range limits become points. inf: hit nothing (use_inf). range_min 0.45 m: the robot itself.</p></div>
+<div class="card why"><p class="tag">WHY .matrix() HERE</p><p>Points are positions: they need rotation and shift. Speeds only needed .linear().</p></div>
+<div class="card why"><p class="tag">WHY SKIP THE SCAN</p><p>Points in the wrong frame give a wrong motion the filter would trust. The first scan is only stored: ICP needs two.</p></div>
+</div>
+</div>
+<aside>A lidar scan is a list of distances. The lidar turns around and measures one distance every half degree, about seven hundred and twenty per turn, and where a ray hits something, we get a point. The first ray points in the direction angle_min. The loop goes over every ray; in C++ a for loop has three parts: start at zero, continue while i is smaller than the size, add one after each round. A ray only becomes a point if it’s usable: it must be finite, because rays that hit nothing come as infinity since the launch file sets use_inf, and it must be inside the range limits; the minimum of forty five centimetres cuts off the robot itself. Then the polar to x-y conversion: x is r times the cosine of the angle, y is r times the sine. About two hundred and fifty points remain on the bag. Next, TASK 1 gives the lidar’s mounting, and transformPointCloud moves every point into the robot frame with the full matrix, because points are positions and need both the rotation and the shift. If the transform failed, the scan is skipped: points in the wrong frame are worse than none. The very first scan has nothing to compare with, so it’s only stored as the last scan, with its time.</aside>
+</section>

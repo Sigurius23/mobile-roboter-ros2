@@ -1,0 +1,12 @@
+<section id="task2turn" class="alt">
+<div class="head">
+<p class="eyebrow">TASK 2 · REAL SCANS WHILE TURNING</p>
+<h2>Why the guess matters</h2>
+</div>
+<p class="lead">The robot turns on the spot, almost 50° within half a second. Same scan pair, two starting points:</p>
+<div class="row">
+<div class="card warn"><p class="tag">ICP STARTED AT ZERO</p><p class="big red">9 pairs</p><p>Most points are over a metre from any partner. The result is nonsense.</p></div>
+<div class="card why"><p class="tag">ICP STARTED AT THE GUESS</p><p class="big green">197 pairs</p><p>Turn −0.837 rad; the wheels say −0.838 rad.</p></div>
+</div>
+<aside>Here’s why the guess matters, on real scans. The robot turns on the spot, almost fifty degrees within half a second. Started at zero, most points are more than a metre from any partner. Only nine pairs survive the one-metre limit, and ICP returns nonsense. Started at the filter’s guess, it lines up within a few iterations, with a hundred and ninety seven pairs, and the turn matches the wheels: minus 0.837 radians against minus 0.838. ICP only finds the nearest alignment, so where it starts matters. Always starting at zero fails on fast turns and large gaps.</aside>
+</section>

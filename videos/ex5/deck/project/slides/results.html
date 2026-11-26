@@ -1,0 +1,17 @@
+<section id="results" class="alt">
+<div class="head">
+<p class="eyebrow">RESULTS · 40 S DRIVE, dlg_feldtage_24:cut</p>
+<h2>What the three fixes changed</h2>
+</div>
+<div class="row">
+<div class="card"><p class="tag">WHEELS</p><p class="big">26.3 m</p><p>down the field</p></div>
+<div class="card"><p class="tag">ICP ALONE</p><p class="big teal">22.3 m</p><p>about 15 % short</p></div>
+</div>
+<table>
+<tr><th style="width:30%">end of the drive (x, y, θ)</th><th style="width:35%">original</th><th>fixed</th></tr>
+<tr><td>no ICP</td><td>4.88, −26.22, −78.6°</td><td>1.74, −26.34, −90.0°</td></tr>
+<tr><td>ICP + filter</td><td>2.16, −23.48, −85.3°</td><td>2.25, −26.34, −88.0°</td></tr>
+<tr><td>bag with --loop</td><td>frozen at 44.5 s</td><td>resets, continues</td></tr>
+</table>
+<aside>On the real bag, the wheels end twenty six metres down the field. ICP alone ends at twenty two, about fifteen percent short. With the three fixes, the filter without ICP matches Exercise 4 again: the heading goes from minus 78.6 to minus 90 degrees, because the IMU topic changed. The fused filter keeps the wheels’ distance, minus 26.34 in y instead of minus 23.48, with the heading near the gyroscope. And the bag can loop: before, the robot froze at 44.5 seconds; now the filter resets and continues. The three fixes again: FIX 1, the reset when the bag loops; FIX 2, the ICP noise formula; FIX 3, the IMU topic.</aside>
+</section>

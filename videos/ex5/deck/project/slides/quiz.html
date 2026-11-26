@@ -1,0 +1,19 @@
+<section id="quiz" class="alt">
+<div class="head">
+<p class="eyebrow">QUICK QUIZ · ANSWER FIRST, THEN CLICK</p>
+<h2>Six questions</h2>
+</div>
+<div class="row">
+<div class="col">
+<div class="qa"><h3>What does getTransform return, and which way?</h3><p class="fragment">A rotation and shift from the sensor frame into base_footprint, or false.</p></div>
+<div class="qa"><h3>Why is the guess sideways zero?</h3><p class="fragment">Wheeled robots can’t slide sideways.</p></div>
+<div class="qa"><h3>Why invert the guess and the result?</h3><p class="fragment">ICP moves points, which move opposite to the robot.</p></div>
+</div>
+<div class="col">
+<div class="qa"><h3>Why R = V·Uᵀ, and what if det R &lt; 0?</h3><p class="fragment">Best least-squares rotation; flip V’s last column.</p></div>
+<div class="qa"><h3>Why does ICP enter the filter as a speed?</h3><p class="fragment">It measures a change between scans, not a position.</p></div>
+<div class="qa"><h3>Which three things were fixed?</h3><p class="fragment">Loop reset, ICP noise (no √N, σ_ω / dt), /imu/data_raw.</p></div>
+</div>
+</div>
+<aside>Pause on each question and answer it out loud before revealing the answer; each click shows the next one. getTransform returns a rotation and shift from the sensor frame into base_footprint, or false. The guess is sideways zero because wheeled robots can’t slide sideways. We invert the guess and the result because ICP moves points, and points move opposite to the robot. R = V Uᵀ is the best least-squares rotation, and if its determinant is negative you flip the last column of V. ICP enters the filter as a speed because it measures a change between scans, not a position. The three fixes: the reset when the bag loops, the ICP noise formula, and the IMU topic.</aside>
+</section>

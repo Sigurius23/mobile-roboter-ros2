@@ -1,0 +1,17 @@
+<section id="extraqa">
+<div class="head">
+<p class="eyebrow">PART 5 · FOUR MORE QUESTIONS</p>
+<h2>Questions the first four parts left out</h2>
+</div>
+<div class="row">
+<div class="col">
+<div class="qa"><h3>A pair is exactly 1 m apart. Is it kept?</h3><p>No. The test is nn_dist_sq[0] &lt; 1.0, and 1.0 &lt; 1.0 is false.</p></div>
+<div class="qa"><h3>Why must σ_ω be divided by dt?</h3><p>z = Δθ / dt is a rate in rad/s; rms / r̄ is an angle error per scan. Without / dt it was 20× too small.</p></div>
+</div>
+<div class="col">
+<div class="qa"><h3>Finer angle step, or smaller range_max?</h3><p>Finer: more points, a little better (sim 18.1 → 14.9 m), more computation. Smaller range_max: worse (sim 20.4 m).</p></div>
+<div class="qa"><h3>What do the TF broadcaster and listener do?</h3><p>Broadcaster: publishes odom → base_footprint. Listener: fills the buffer from /tf and /tf_static, which getTransform asks.</p></div>
+</div>
+</div>
+<aside>Four more questions. A pair exactly one metre apart: is it kept? No. The test is squared distance smaller than one, and one is not smaller than one, so it’s rejected; a classic trap in worked examples. Why must sigma omega be divided by dt? The measurement is a turn rate in radians per second, but residual over radius is an angle error per scan, in radians. Dividing by dt turns it into a rate error; without it the error was twenty times too small and ICP overruled the gyroscope. Would a finer angle step or a smaller range_max help? A finer step gives more points and helps a little, at the cost of computation. A smaller maximum range made it worse in the simulation, because on an open field the far features are often the only clue to forward motion. What do the TF broadcaster and listener do? The broadcaster publishes our own result, odom to base_footprint. The listener subscribes to /tf and /tf_static and fills the buffer, and getTransform asks that buffer how each sensor is mounted.</aside>
+</section>

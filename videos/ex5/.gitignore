@@ -4,3 +4,5 @@
 *.storyboard*.png
 voice/
 __pycache__/
+# raw RViz screen grabs (data/rviz_clip holds the cropped frames the video uses)
+data/rviz_frames/

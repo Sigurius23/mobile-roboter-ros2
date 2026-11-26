@@ -1,0 +1,28 @@
+<section id="map">
+<div class="head">
+<p class="eyebrow">PART 1 · HOW THE NODE IS BUILT</p>
+<h2>The whole node in one picture</h2>
+</div>
+<div class="flow">
+<div class="box"><h3>lidar scan</h3><p>a ring of distances, 20× a second</p></div>
+<p class="arrow">→</p>
+<div class="box"><h3>scanCallback</h3><p>runs for every scan</p></div>
+<p class="arrow">→</p>
+<div class="box task"><h3>TASK 1 getTransform</h3><p>sensor frame → robot frame</p></div>
+<div></div><div></div><div></div><div></div>
+<p class="arrow">↓</p>
+<div class="box"><h3>Kalman filter</h3><p>combines all sensors</p></div>
+<p class="arrow">←</p>
+<div class="box task"><h3>TASK 3 ICP loop</h3><p>how did the robot move?</p></div>
+<p class="arrow">←</p>
+<div class="box task"><h3>TASK 2 initial guess</h3><p>where ICP starts looking</p></div>
+<p class="arrow">↓</p>
+<p class="arrow">↖</p>
+<div></div><div></div><div></div>
+<div class="box"><h3>robot pose</h3><p>TF odom → base_footprint</p></div>
+<div></div>
+<div class="box"><h3>odom / IMU callbacks</h3><p>wheels and gyroscope</p></div>
+<div></div><div></div>
+</div>
+<aside>Here’s the whole node in one picture. Everything starts with a lidar scan: a ring of distance measurements, twenty times a second. For every scan, the node runs a function called scanCallback. TASK 1 converts the scan from the sensor’s frame into the robot’s frame. TASK 2 guesses how far the robot moved since the last scan. TASK 3, the ICP loop, shifts the old scan onto the new one and measures the real motion. That motion goes into a Kalman filter, which combines it with the other sensors. The filter’s result is the robot’s pose, which the node publishes on TF as odom to base_footprint. The wheels and the gyroscope feed the same filter through their own callbacks. That’s where Part 1 starts.</aside>
+</section>

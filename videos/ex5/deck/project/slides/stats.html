@@ -1,0 +1,16 @@
+<section id="stats">
+<div class="head">
+<p class="eyebrow">TASK 3 · STATISTICS AND RESULT · LINES 593–628</p>
+<h2>What icp() returns</h2>
+</div>
+<div class="row">
+<div class="card"><p class="tag">N · PAIRS</p><p class="big teal">248</p><p>pairs again after the loop, same 1 m limit</p></div>
+<div class="card"><p class="tag">RESIDUAL RMS</p><p class="big">0.165 m</p><p>the typical leftover gap between partners</p></div>
+<div class="card"><p class="tag">AVERAGE RADIUS</p><p class="big green">21.9 m</p><p>how far the points are from the robot</p></div>
+</div>
+<div class="row">
+<p class="code" style="flex:1.4">Eigen::Matrix3d T_robot = T_total.inverse();<br>res.delta = Vector3d(T_robot(0, 2), T_robot(1, 2),<br>&#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;atan2(T_robot(1, 0), T_robot(0, 0)));</p>
+<div class="card why" style="flex:1"><p class="tag">THE INVERSE TRICK IN REVERSE</p><p>T_total says how the points moved; inverting it gives how the robot moved: forward, sideways, turn.</p></div>
+</div>
+<aside>After the loop, the pairs are formed once more, with the same one metre limit, to measure how good the fit is. For each pair the squared gap is added up, and the partner’s distance from the robot; Part 4 needs that, because a small turn moves far points a lot. N counts the pairs. The residual is the root mean square of the gaps: the typical leftover distance between partners. On the bag, typically about two hundred and fifty pairs, sixteen centimetres, and twenty two metres; these are medians. Finally, the inverse trick in reverse: T_total says how the points moved, and inverting it gives how the robot moved. The result is three numbers, forward, sideways and the turn angle, read from the matrix with atan2. Testat question: does a small residual mean the match is right? No. Along a long wall, point-to-point ICP can slide: every point still finds a close partner, so the residual stays small while the motion is wrong. It measures fit, not whether the motion is determined.</aside>
+</section>

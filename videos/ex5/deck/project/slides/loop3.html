@@ -1,0 +1,17 @@
+<section id="loop3" class="alt">
+<div class="head">
+<p class="eyebrow">TASK 3 · STEPS 5–7 · LINES 571–589</p>
+<h2>Move, add up, stop</h2>
+</div>
+<div class="row">
+<div class="col2">
+<p class="code"><span class="c">// 5) move the old points by this round's R and t</span><br><span class="k">double</span> x_new = R(0,0) * p.x + R(0,1) * p.y + t(0);<br>p.x = static_cast&lt;<span class="k">float</span>&gt;(x_new); <span class="c">// PCL stores floats</span><br><br><span class="c">// 6) add this step to the total</span><br>T_step.block&lt;2, 2&gt;(0, 0) = R;<br>T_step.block&lt;2, 1&gt;(0, 2) = t;<br>T_total = T_step * T_total;<br><br><span class="c">// 7) stop when the step is tiny</span><br><span class="k">if</span> (t.norm() &lt; 1e-4 &amp;&amp; std::abs(step_angle) &lt; 1e-4) <span class="k">break</span>;</p>
+</div>
+<div class="col">
+<div class="card cpp"><p class="tag">C++</p><p>.block&lt;rows, cols&gt;(row, col): the part of the matrix starting at (row, col).</p></div>
+<div class="card why"><p class="tag">WHY T_step · T_total</p><p>T_total maps the original points to before this step; the new step comes after it, and products apply right to left.</p></div>
+<div class="card why"><p class="tag">WHY 1e-4</p><p>Under 0.1 mm and 0.0001 rad, more rounds change nothing measurable.</p></div>
+</div>
+</div>
+<aside>Step five: every old point is moved by this round’s rotation and shift. In the next round the nearest neighbours change, so the pairs get better. The results are stored as float with static_cast, because PCL stores points as float. Step six: the step becomes a matrix. R goes top left and t goes into the last column; in C++, block picks a part of a matrix: its size in the angle brackets, its corner in the round ones. Then it’s added to the total: T_step times T_total. The newest step goes on the left, because it happens after all the earlier ones and matrix products apply from right to left. Step seven: stop when the step is tiny, less than a tenth of a millimetre and less than a ten-thousandth of a radian. More rounds would change nothing you could measure.</aside>
+</section>

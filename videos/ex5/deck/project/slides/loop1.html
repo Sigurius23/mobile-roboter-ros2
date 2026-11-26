@@ -1,0 +1,17 @@
+<section id="loop1" class="alt">
+<div class="head">
+<p class="eyebrow">TASK 3 · STEP 1 · LINES 522–539</p>
+<h2>Step 1: pairs</h2>
+</div>
+<div class="row">
+<div class="col2">
+<p class="code">std::vector&lt;Eigen::Vector2d&gt; src_pts, tgt_pts;<br><span class="k">for</span> (<span class="k">const auto</span> &amp;p : src_transformed-&gt;points)<br>{<br>&#160; <span class="k">if</span> (kdtree.nearestKSearch(p, 1, nn_idx, nn_dist_sq) &gt; 0<br>&#160; &#160; &#160; &amp;&amp; nn_dist_sq[0] &lt; 1.0)<br>&#160; {<br>&#160; &#160; <span class="k">const auto</span> &amp;q = (*tgt_cloud)[nn_idx[0]];<br>&#160; &#160; src_pts.emplace_back(p.x, p.y);<br>&#160; &#160; tgt_pts.emplace_back(q.x, q.y);<br>&#160; }<br>}<br><span class="k">if</span> (src_pts.size() &lt; 3) <span class="k">break</span>;</p>
+</div>
+<div class="col">
+<div class="card cpp"><p class="tag">C++</p><p>std::vector: a list that can grow. for (const auto &amp;p : list) gives each element in turn, without copying it.</p></div>
+<div class="card why"><p class="tag">WHY d² &lt; 1.0</p><p>The tree already returns squared distances: d² &lt; 1 means d &lt; 1 m, no square root needed.</p></div>
+<div class="card warn"><p class="tag">TRAP</p><p>A pair exactly 1 m apart is rejected: 1.0 &lt; 1.0 is false.</p></div>
+</div>
+</div>
+<aside>Each round starts with two empty lists: the old points that found a partner, and their partners. In C++, a vector is a list that can grow. Step one: pairs. The loop goes over every old point; this kind of for loop gives each element in turn, by reference, without copying it. The kd-tree finds the one nearest new point. The pair is kept only if the squared distance is below one, so closer than one metre. The tree already returns squared distances, so comparing with one needs no square root. One trap in worked examples: a pair exactly one metre apart is rejected, because one is not smaller than one. If it’s close enough, the partner is looked up by its index and both points are added to the lists. With fewer than three pairs, the loop stops. Testat question: why one metre, not more or less? Too big, and points pair up with different objects. Too small, and there are no pairs when the guess is a bit off. Between two scans fifty milliseconds apart the robot moves about five centimetres, so one metre leaves a large margin.</aside>
+</section>

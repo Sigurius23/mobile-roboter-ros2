@@ -1,0 +1,23 @@
+<section id="whyshort">
+<div class="head">
+<p class="eyebrow">THE QUESTION ON THE SHEET</p>
+<h2>Why does ICP fall short here?</h2>
+</div>
+<div class="row">
+<div class="card warn"><p class="tag">WHY</p>
+<ul class="plain">
+<li>point-to-point ICP slides along walls and fences</li>
+<li>few rigid features 2–6 m up on an open field</li>
+<li>far points are sparse: 0.5° at 20 m ≈ 17 cm apart</li>
+<li>leafy tree tops change shape every scan</li>
+</ul></div>
+<div class="card why"><p class="tag">BETTER APPROACHES</p>
+<ul class="plain">
+<li>point-to-line ICP (PL-ICP), GICP</li>
+<li>outlier rejection</li>
+<li>check the geometry before trusting ICP</li>
+<li>NDT</li>
+</ul></div>
+</div>
+<aside>This is the question on the sheet. Point-to-point ICP slides along walls: every point still finds a close partner, so it can’t see motion along the wall. The slice has few rigid features on an open field, far points are sparse, about seventeen centimetres apart at twenty metres, and leafy tree tops change shape every scan. Better approaches: point-to-line ICP measures the distance to the line through the neighbours, so sliding along a wall costs nothing and the residual shows the real error. Add outlier rejection, and a check whether the geometry pins down the motion at all before trusting ICP. NDT is another option.</aside>
+</section>

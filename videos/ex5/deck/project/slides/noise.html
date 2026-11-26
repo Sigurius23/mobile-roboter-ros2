@@ -1,0 +1,17 @@
+<section id="noise" class="alt">
+<div class="head">
+<p class="eyebrow">FIX 2 · LINES 420–424</p>
+<h2>How sure is ICP?</h2>
+</div>
+<div class="row">
+<div class="col2">
+<p class="code"><span class="k">const double</span> sigma_trans = residual_rms; <span class="c">// ≈ 0.165 m</span><br><span class="k">const double</span> sigma_angle = residual_rms / std::max(avg_radius, 1.0);<br><br><span class="k">double</span> sigma_v = std::clamp(sigma_trans / dt_scan, 0.05, 5.0);<br><span class="k">double</span> sigma_w = std::clamp(sigma_angle / dt_scan, 0.01, 2.0);</p>
+<div class="card why"><p class="tag">WHY THESE FORMULAS</p><p>The leftover gap is the position error of one scan. A turn by α moves a point at distance r by r·α, so α ≈ gap / r. z is a speed, so its error must be one too: divide by dt.</p></div>
+</div>
+<div class="col">
+<div class="card warn"><p class="tag">ORIGINAL: σ = rms / √N</p><p class="big red">16×</p><p>too precise (N ≈ 248, √N ≈ 16)</p></div>
+<div class="card warn"><p class="tag">ORIGINAL: σ_ω WITHOUT / dt</p><p class="big red">20×</p><p>too small: ICP overruled wheels and gyro; fused path 2.7 m short</p></div>
+</div>
+</div>
+<aside>The filter weighs every sensor by its uncertainty, sigma. For ICP, sigma comes from the leftover gap, the residual from Part 3. The original formula made ICP look about sixteen times too precise, so this block was fixed. The position error per scan is the residual itself, about sixteen centimetres on the bag. For the angle, the residual is divided by the average radius: a turn by a small angle moves a point at distance r by r times that angle, so the angle error is the gap divided by r; the max with one avoids dividing by almost zero. Both are divided by dt, because the measurement is a speed, so its error must be a speed error too; clamp keeps them inside sensible limits. The original divided the residual by the square root of N. With about two hundred and fifty pairs that’s sixteen times smaller. It also forgot dt for the turn rate, twenty times too small. So ICP overruled the wheels and the gyroscope, and the fused path came out 2.7 metres short. Testat question: why was rms over root N replaced? It assumes N independent measurements, but neighbouring lidar points lie on the same wall, make the same error, and slide together.</aside>
+</section>
