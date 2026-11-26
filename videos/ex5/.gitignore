@@ -1,0 +1,6 @@
+# rendered output and caches: recreate with manimgx
+*.mp4
+*.srt
+*.storyboard*.png
+voice/
+__pycache__/
